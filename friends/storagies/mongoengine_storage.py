@@ -17,11 +17,17 @@ class MongoengineUserMixin(UserMixin):
         return cls.user_model().objects.filter(**flt).count() > 0
 
     @classmethod
-    def get_users_by_email(cls, email):
+    def get_user_by_email(cls, email):
         """Return users instance for given email address"""
         flt = dict()
         flt[cls.username_field()] = email
-        return cls.user_model().objects.filter(**flt)
+        return cls.user_model().objects.filter(**flt).first()
+
+    @classmethod
+    def get_user_by_id(cls, id):
+        flt = dict()
+        flt[cls.id_field()] = id
+        return cls.user_model().objects.filter(**flt).first()
 
 
 class MongoengineFriendInvitationMixin(FriendInvitationMixin):

@@ -1,6 +1,6 @@
-from mongoengine import ReferenceField
+from mongoengine_storage import ReferenceField
 
-from friends.storagies.mongoengine import BaseMongoengineStorage, MongoenginFriendsMixin, \
+from friends.storagies.mongoengine_storage import BaseMongoengineStorage, MongoenginFriendsMixin, \
     MongoengineFriendInvitationMixin, MongoengineFriendshipRequestMixin, MongoengineUserMixin
 from friends.utils import module_member
 

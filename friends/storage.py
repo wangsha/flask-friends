@@ -1,4 +1,12 @@
 class UserMixin(object):
+    @classmethod
+    def get_id(cls, user):
+        """Return the email for given user"""
+        return getattr(user, cls.email_field(), None)
+
+    @classmethod
+    def id_field(cls):
+        return getattr(cls.user_model(), 'ID_FIELD', 'id')
 
     @classmethod
     def get_email(cls, user):
@@ -17,17 +25,21 @@ class UserMixin(object):
     @classmethod
     def user_exisits(cls, email):
         """
-        Return True/False if a User instance exisits with given email address.
+        Return True/False if a User instance exists with given email address.
         :param email: String
         :return: Boolean
         """
         raise NotImplementedError('Implement in subclass')
 
     @classmethod
-    def get_users_by_email(cls, email):
-        """Return users instance for given email address"""
+    def get_user_by_email(cls, email):
+        """Return user instance for given email address"""
         raise NotImplementedError('Implement in subclass')
 
+    @classmethod
+    def get_user_by_id(cls, id):
+        """Return user instance for given id"""
+        raise NotImplementedError('Implement in subclass')
 
 class FriendInvitationMixin(object):
     '''
@@ -68,6 +80,7 @@ class FriendshipRequestMixin(object):
     def get_request(cls, from_user, to_user):
         """Return a non-rejected friendship request"""
         raise NotImplementedError('Implement in subclass')
+
 
     @classmethod
     def get_request_by_from_user(cls, from_user):
