@@ -13,7 +13,10 @@ class FlaskMongoengineStorage(BaseMongoengineStorage):
 
 
 def init_friends(app, db):
-    User = module_member(app.config['FRIENDS_USER_MODEL'])
+    if type(app.config['FRIENDS_USER_MODEL']) == 'str':
+        User = module_member(app.config['FRIENDS_USER_MODEL'])
+    else:
+        User = app.config['FRIENDS_USER_MODEL']
 
     class UserKlass(User, MongoengineUserMixin):
         @classmethod
