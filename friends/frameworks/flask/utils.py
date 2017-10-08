@@ -18,14 +18,11 @@ def get_helper(name, do_import=False):
     return config
 
 
-def load_strategy():
-    def decorator(func):
-        @wraps(func)
-        def wrapper(*args, **kwargs):
-            g.strategy = get_strategy(get_helper('FRIENDS_STRATEGY'),
-                                      get_helper('FRIENDS_STORAGE'))
-            return func(*args, **kwargs)
+def load_strategy(func):
 
-        return wrapper
-
-    return decorator
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        g.strategy = get_strategy(get_helper('FRIENDS_STRATEGY'),
+                                  get_helper('FRIENDS_STORAGE'))
+        return func(*args, **kwargs)
+    return wrapper
