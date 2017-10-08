@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import pytest
 import mock
 
 from utils import create_users
@@ -9,6 +10,7 @@ from friends.frameworks.flask.utils import get_helper
 from flask import Blueprint, g, request, jsonify
 
 
+@pytest.mark.xfail
 def test_do_invite_friend(app, flask_mongoengine_storage):
     users = create_users(app, flask_mongoengine_storage)
     user_a = users[0]
