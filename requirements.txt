@@ -3,4 +3,5 @@ flask-mongoengine==0.9.3
 itsdangerous==0.24
 pytest==3.2.2
 mock==2.0.0
-pytest-cover==3.0.0
+pytest-cover==2.0.0
+flake8==3.4.1
