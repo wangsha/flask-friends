@@ -1,6 +1,5 @@
 .PHONY: clean clean-test clean-pyc
 clean: clean-test clean-pyc
-ENV:=dev
 
 
 clean-pyc:
@@ -15,16 +14,14 @@ clean-test:
 	rm -f junit.xml
 
 install: clean
-	pip install -r requirements/${ENV}.txt
+	pip install -r requirements.txt
+	pip install -e .
 
 lint:
 	flake8
 
-lint-changes:
-	flake8 $$(git status -s | grep -E '\.py$$' | cut -c 4-)
-
 test .coverage:
-	pytest --cov-report= --cov=pd --cov-fail-under=100 --reset-db --schema-mode=alembic pd
+	pytest --cov-report= --cov=friends
 
 cov: .coverage
 	@coverage report --skip-covered
