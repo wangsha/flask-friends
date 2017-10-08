@@ -11,6 +11,7 @@ def module_member(name):
     module = import_module(mod)
     return getattr(module, member)
 
+
 def get_strategy(strategy, storage, *args, **kwargs):
     Strategy = module_member(strategy)
     Storage = module_member(storage)

@@ -21,7 +21,7 @@ lint:
 	flake8
 
 test .coverage:
-	pytest --cov-report= --cov=friends
+	pytest --cov-report=term:skip-covered --cov=friends --cov-branch
 
 cov: .coverage
 	@coverage report --skip-covered

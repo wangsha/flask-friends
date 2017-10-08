@@ -14,7 +14,7 @@ import pytest
 from flask import Flask
 from flask_mongoengine import MongoEngine
 from friends.storagies.flask_mongoengine_storage import FlaskMongoengineStorage, init_friends
-from friends.storagies.mongoengine_storage import MongoengineUserMixin, BaseMongoengineStorage
+from friends.storagies.mongoengine_storage import MongoengineUserMixin
 
 
 @pytest.fixture()
@@ -35,7 +35,6 @@ def flask_mongoengine_storage(app):
         active = db.BooleanField(default=True)
 
         meta = {'allow_inheritance': True}
-
 
     app.config['FRIENDS_USER_MODEL'] = User
     init_friends(app, db)

@@ -34,7 +34,6 @@ def init_friends(app, db):
         user1 = ReferenceField(User, required=True)
         user2 = ReferenceField(User, required=True, unique_with='user1')
 
-
     FlaskMongoengineStorage.user = UserKlass
     FlaskMongoengineStorage.friendInvitation = FriendInvitation
     FlaskMongoengineStorage.friendshipRequest = FriendshipRequest

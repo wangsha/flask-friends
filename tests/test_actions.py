@@ -4,10 +4,7 @@ import pytest
 import mock
 
 from utils import create_users
-from friends.utils import get_strategy
 from friends.actions import do_invite_friend
-from friends.frameworks.flask.utils import get_helper
-from flask import Blueprint, g, request, jsonify
 
 
 @pytest.mark.xfail

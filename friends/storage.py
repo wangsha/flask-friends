@@ -41,6 +41,7 @@ class UserMixin(object):
         """Return user instance for given id"""
         raise NotImplementedError('Implement in subclass')
 
+
 class FriendInvitationMixin(object):
     '''
     Friendship invitation to non-exisiting users.
@@ -80,7 +81,6 @@ class FriendshipRequestMixin(object):
     def get_request(cls, from_user, to_user):
         """Return a non-rejected friendship request"""
         raise NotImplementedError('Implement in subclass')
-
 
     @classmethod
     def get_request_by_from_user(cls, from_user):
