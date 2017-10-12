@@ -18,7 +18,6 @@ class BaseStrategy(object):
         """
         raise NotImplementedError('Implement in subclass')
 
-
     def send_friendship_invitation_email(self, from_user, to_user_email, message):
         """Send email notification to non-existing user
         """

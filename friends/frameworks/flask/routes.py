@@ -40,7 +40,7 @@ def reject_friend_request(token):
 
 @friends_blueprint.route('/cancel/<string:token>', methods=('POST'))
 @load_strategy
-def reject_friend_request(token):
+def cancel_friend_request(token):
     cancel_friendship_request(g.strategy, token)
     return 'Ok', 200
 

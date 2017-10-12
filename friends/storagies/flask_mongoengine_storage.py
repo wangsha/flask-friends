@@ -1,4 +1,4 @@
-from mongoengine_storage import ReferenceField
+from mongoengine import ReferenceField
 
 from friends.storagies.mongoengine_storage import BaseMongoengineStorage, MongoenginFriendsMixin, \
     MongoengineFriendInvitationMixin, MongoengineFriendshipRequestMixin, MongoengineUserMixin
@@ -13,7 +13,10 @@ class FlaskMongoengineStorage(BaseMongoengineStorage):
 
 
 def init_friends(app, db):
-    User = module_member(app.config['FRIENDS_USER_MODEL'])
+    if type(app.config['FRIENDS_USER_MODEL']) == str:
+        User = module_member(app.config['FRIENDS_USER_MODEL'])
+    else:
+        User = app.config['FRIENDS_USER_MODEL']
 
     class UserKlass(User, MongoengineUserMixin):
         @classmethod
@@ -30,7 +33,6 @@ def init_friends(app, db):
     class Friends(MongoenginFriendsMixin):
         user1 = ReferenceField(User, required=True)
         user2 = ReferenceField(User, required=True, unique_with='user1')
-
 
     FlaskMongoengineStorage.user = UserKlass
     FlaskMongoengineStorage.friendInvitation = FriendInvitation

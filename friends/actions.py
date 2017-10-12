@@ -1,5 +1,6 @@
 from itsdangerous import URLSafeSerializer
 
+
 def _get_serializer(strategy):
     serializer = URLSafeSerializer(strategy.encryption_key())
     return serializer
@@ -52,6 +53,7 @@ def _load_friendship_request(strategy, token):
         to_user=to_user
     )
     return request
+
 
 def accept_friendship_request(strategy, token):
     request = _load_friendship_request(strategy, token)
