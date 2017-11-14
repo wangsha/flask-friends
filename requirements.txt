@@ -1,0 +1,7 @@
+Flask==0.12.2
+flask-mongoengine==0.9.3
+itsdangerous==0.24
+pytest==3.2.2
+mock==2.0.0
+pytest-cov==2.5.1
+flake8==3.4.1
