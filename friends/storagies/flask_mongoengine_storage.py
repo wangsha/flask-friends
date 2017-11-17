@@ -23,14 +23,14 @@ def init_friends(app, db):
         def user_model(cls):
             return User
 
-    class FriendInvitation(MongoengineFriendInvitationMixin):
+    class FriendInvitation(MongoengineFriendInvitationMixin, db.Document):
         from_user = ReferenceField(User, required=True, unique_with='to_user_email')
 
-    class FriendshipRequest(MongoengineFriendshipRequestMixin):
+    class FriendshipRequest(MongoengineFriendshipRequestMixin, db.Document):
         from_user = ReferenceField(User, required=True)
         to_user = ReferenceField(User, required=True, unique_with='from_user')
 
-    class Friends(MongoenginFriendsMixin):
+    class Friends(MongoenginFriendsMixin, db.Document):
         user1 = ReferenceField(User, required=True)
         user2 = ReferenceField(User, required=True, unique_with='user1')
 
