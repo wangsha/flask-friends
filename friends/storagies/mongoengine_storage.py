@@ -49,7 +49,7 @@ class MongoengineFriendInvitationMixin(FriendInvitationMixin):
         return cls.objects.filter(to_user_email=to_user_email)
 
     @classmethod
-    def remove(cls, ids_to_delete):
+    def remove(cls, *ids_to_delete):
         cls.objects.filter(pk__in=ids_to_delete).delete()
 
 
@@ -70,7 +70,7 @@ class MongoengineFriendshipRequestMixin(FriendshipRequestMixin):
     @classmethod
     def get_request(cls, from_user, to_user):
         """Return a non-rejected friendship request"""
-        return cls.objects(from_user=from_user, to_user=to_user, rejected_at=None)
+        return cls.objects(from_user=from_user, to_user=to_user, rejected_at=None).first()
 
     @classmethod
     def get_request_by_from_user(cls, from_user):
@@ -93,11 +93,11 @@ class MongoengineFriendshipRequestMixin(FriendshipRequestMixin):
         return cls.objects(to_user=to_user, rejected_at__neq=None)
 
     @classmethod
-    def remove(cls, ids_to_delete):
+    def remove(cls, *ids_to_delete):
         return cls.objects.filter(pk__in=ids_to_delete).delete()
 
     @classmethod
-    def reject(cls, ids_to_reject):
+    def reject(cls, *ids_to_reject):
         return cls.objects.filter(pk__in=ids_to_reject).update(set__rejected_at=datetime.utcnow())
 
 
@@ -109,7 +109,7 @@ class MongoenginFriendsMixin(FriendsMixin):
     def create(cls, user1, user2):
         query1 = Q(user1=user1, user2=user2)
         query2 = Q(user1=user2, user2=user1)
-        obj = cls.objects.filter(query1 or query2).first()
+        obj = cls.objects.filter(query1 | query2).first()
         if not obj:
             obj = cls(user1=user1, user2=user2)
             obj.save()
@@ -118,11 +118,11 @@ class MongoenginFriendsMixin(FriendsMixin):
 
     @classmethod
     def get_friends(cls, user):
-        res = cls.objects.filter(Q(user1=user) or Q(user2=user)).first()
+        res = cls.objects.filter(Q(user1=user) | Q(user2=user))
         return res
 
     @classmethod
-    def remove(cls, ids_to_delete):
+    def remove(cls, *ids_to_delete):
         return cls.objects.filter(pk__in=ids_to_delete).update(set__rejected_at=datetime.utcnow())
 
 

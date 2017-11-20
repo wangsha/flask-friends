@@ -1,4 +1,5 @@
 from mongoengine import ReferenceField
+from flask_mongoengine import Document
 
 from friends.storagies.mongoengine_storage import BaseMongoengineStorage, MongoenginFriendsMixin, \
     MongoengineFriendInvitationMixin, MongoengineFriendshipRequestMixin, MongoengineUserMixin
@@ -23,14 +24,14 @@ def init_friends(app, db):
         def user_model(cls):
             return User
 
-    class FriendInvitation(MongoengineFriendInvitationMixin, db.Document):
+    class FriendInvitation(MongoengineFriendInvitationMixin, Document):
         from_user = ReferenceField(User, required=True, unique_with='to_user_email')
 
-    class FriendshipRequest(MongoengineFriendshipRequestMixin, db.Document):
+    class FriendshipRequest(MongoengineFriendshipRequestMixin, Document):
         from_user = ReferenceField(User, required=True)
         to_user = ReferenceField(User, required=True, unique_with='from_user')
 
-    class Friends(MongoenginFriendsMixin, db.Document):
+    class Friends(MongoenginFriendsMixin, Document):
         user1 = ReferenceField(User, required=True)
         user2 = ReferenceField(User, required=True, unique_with='user1')
 

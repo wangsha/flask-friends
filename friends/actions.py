@@ -60,8 +60,6 @@ def _load_friendship_request(strategy, token):
 def accept_friendship_request(strategy, token):
     request = _load_friendship_request(strategy, token)
     storage = strategy.storage
-    import pdb
-    pdb.set_trace()
     storage.friendshipRequest.remove(request.id)
     storage.friends.create(user1=request.from_user, user2=request.to_user)
 
