@@ -5,7 +5,9 @@ import pytest
 from mock import call
 from utils import make_token
 from friends.actions import do_invite_friend, _load_friendship_request,\
-    friendship_request_list, accept_friendship_request
+    friendship_request_list, accept_friendship_request, new_user_created,\
+    reject_friendship_request, cancel_friendship_request, friendlist,\
+    friendship_request_list_rejected
 
 
 def test_do_invite_friend(app, users, strategy):
@@ -30,17 +32,26 @@ def test_do_invite_friend(app, users, strategy):
         from_user=from_user, to_user=to_user, message=message).count() > 0
 
 
-def test_new_user_created(app, flask_mongoengine_storage):
-    pass
+def test_new_user_created(strategy, users):
+    email = 'newuser@ff.com'
+    do_invite_friend(
+        strategy, from_user=users[0], to_user_email=email, message='')
+    do_invite_friend(
+        strategy, from_user=users[1], to_user_email=email, message='')
+    user = strategy.storage.user.objects.create(
+        email=email, username='newuser', password='pw')
+    new_user_created(strategy, user)
+    assert not strategy.storage.friendInvitation.objects
+    res = friendship_request_list(strategy, user)
+    assert len(res['requesting']) == 0
+    assert len(res['requested']) == 2
 
 
 def test_load_friendship_request(strategy, users):
     from_user = users[0]
     to_user = users[1]
-    do_invite_friend(strategy, from_user=from_user, to_user_email=to_user.email,
-                     message="Hello!")
-    token = make_token(strategy, from_user, to_user)
-    request = _load_friendship_request(strategy, token)
+    token, request = _do_invite_return_token_request(
+        strategy, from_user, to_user)
     assert request.from_user == from_user
     assert request.to_user == to_user
 
@@ -48,23 +59,39 @@ def test_load_friendship_request(strategy, users):
 def test_accept_friendship_request(strategy, users):
     from_user = users[0]
     to_user = users[1]
+    token, request = _do_invite_return_token_request(
+        strategy, from_user, to_user)
+    accept_friendship_request(strategy, token)
+    assert not strategy.storage.friendshipRequest.objects.filter(pk=request.id)
+    assert strategy.storage.friends.objects.filter(
+        user1=from_user, user2=to_user).count() == 1
+
+
+def test_reject_friendship_request(strategy, users):
+    from_user = users[0]
+    to_user = users[1]
+    token, request = _do_invite_return_token_request(
+        strategy, from_user, to_user)
+    reject_friendship_request(strategy, token)
+    assert strategy.storage.friendshipRequest.objects.get(
+        pk=request.id).rejected_at is not None
+
+
+def test_cancel_friendship_request(strategy, users):
+    from_user = users[0]
+    to_user = users[1]
+    token, request = _do_invite_return_token_request(
+        strategy, from_user, to_user)
+    cancel_friendship_request(strategy, token)
+    assert not strategy.storage.friendshipRequest.objects.filter(pk=request.id)
+
+
+def _do_invite_return_token_request(strategy, from_user, to_user):
     do_invite_friend(strategy, from_user=from_user, to_user_email=to_user.email,
                      message="Hello!")
     token = make_token(strategy, from_user, to_user)
-
-    accept_friendship_request(strategy, token)
-    strategy.storage.friendshipRequest.filter(from_user=from_user, to_user=to_user).count() == 0
-    strategy.storage.friends.filter(user1=request.from_user, user2=request.to_user).count() == 1
-
-
-# def test_reject_friendship_request(strategy, token):
-#     request = _load_friendship_request(strategy, token)
-#     strategy.storage.friendshipRequest.reject(request.id)
-
-
-# def test_cancel_friendship_request(strategy, token):
-#     request = _load_friendship_request(strategy, token)
-#     strategy.storage.friendshipRequest.remove(request.id)
+    request = _load_friendship_request(strategy, token)
+    return token, request
 
 
 def test_friendship_request_list(users, strategy):
@@ -89,3 +116,45 @@ def test_friendship_request_list(users, strategy):
     res = friendship_request_list(strategy, user_b)
     assert len(res['requesting']) == 0
     assert len(res['requested']) == 1
+
+
+def test_friendship_request_list_rejected(strategy, users):
+    user = users[0]
+
+    # invite to user
+    token, request = _do_invite_return_token_request(
+        strategy, users[1], user)
+    reject_friendship_request(strategy, token)
+    token, request = _do_invite_return_token_request(
+        strategy, users[2], user)
+    accept_friendship_request(strategy, token)
+    res = friendship_request_list_rejected(strategy, user)
+    assert len(res['requesting']) == 0
+    assert len(res['requested']) == 1
+    
+    # invite from user
+    token, request = _do_invite_return_token_request(
+        strategy, user, users[3])
+    reject_friendship_request(strategy, token)
+    token, request = _do_invite_return_token_request(
+        strategy, user, users[4])
+    accept_friendship_request(strategy, token)
+    res = friendship_request_list_rejected(strategy, user)
+    assert len(res['requesting']) == 1
+    assert len(res['requested']) == 1
+
+
+def test_friendlist(strategy, users):
+    user = users[0]
+    res = friendlist(strategy, user)
+    assert not res
+    token, request = _do_invite_return_token_request(strategy, users[1], user)
+    accept_friendship_request(strategy, token)
+    token, request = _do_invite_return_token_request(strategy, users[2], user)
+    accept_friendship_request(strategy, token)
+    token, request = _do_invite_return_token_request(strategy, users[3], user)
+    cancel_friendship_request(strategy, token)
+    token, request = _do_invite_return_token_request(strategy, users[4], user)
+    reject_friendship_request(strategy, token)
+    res = friendlist(strategy, user)
+    assert len(res) == 2

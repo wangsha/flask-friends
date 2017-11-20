@@ -85,12 +85,12 @@ class MongoengineFriendshipRequestMixin(FriendshipRequestMixin):
     @classmethod
     def get_rejected_request_by_from_user(cls, from_user):
         """Return rejected friendship requests initiated by given from_user"""
-        return cls.objects(from_user=from_user, rejected_at__neq=None)
+        return cls.objects(from_user=from_user, rejected_at__ne=None)
 
     @classmethod
     def get_rejected_request_by_to_user(cls, to_user):
         """Return rejected friendship requests made to given to_user"""
-        return cls.objects(to_user=to_user, rejected_at__neq=None)
+        return cls.objects(to_user=to_user, rejected_at__ne=None)
 
     @classmethod
     def remove(cls, *ids_to_delete):

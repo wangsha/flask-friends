@@ -37,7 +37,7 @@ def new_user_created(strategy, user):
     """
     storage = strategy.storage
     invitations = storage.friendInvitation.get_invitations_by_email(
-        to_user_email=storage.friendInvitation.get_email(user))
+        to_user_email=user.get_email())
     for invitation in invitations:
         storage.friendshipRequest.create(from_user=invitation.from_user,
                                          to_user=user,
