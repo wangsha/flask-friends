@@ -15,6 +15,7 @@ import pytest
 from flask import Flask
 from flask_mongoengine import MongoEngine
 
+from mongoengine.connection import disconnect
 from friends.strategy import BaseStrategy
 from friends.storagies.flask_mongoengine_storage import FlaskMongoengineStorage, init_friends
 from friends.storagies.mongoengine_storage import MongoengineUserMixin
@@ -26,9 +27,8 @@ def flask_mongoengine_storage(app):
     app.config['MONGODB_SETTINGS'] = {
         'db': db_name,
         'host': 'localhost',
-        'port': 27017,
+        'port': 27018,
     }
-
     db = MongoEngine(app)
 
     class User(db.Document, MongoengineUserMixin):
@@ -46,6 +46,11 @@ def flask_mongoengine_storage(app):
 
     with app.app_context():
         db.connection.drop_database(db_name)
+        # Mongoengine keep a global state of the connections that must be
+        # reset before each test.
+        # Given it doesn't expose any method to get the list of registered
+        # connections, we have to do the cleaning by hand...
+        disconnect()
 
 
 @pytest.fixture()
@@ -92,7 +97,7 @@ def strategy(flask_mongoengine_storage):
 
 @pytest.fixture()
 def app():
-    app = Flask(__name__)
-    app.debug = True
-    app.config['TESTING'] = True
-    return app
+    _app = Flask(__name__)
+    _app.debug = True
+    _app.config['TESTING'] = True
+    return _app
