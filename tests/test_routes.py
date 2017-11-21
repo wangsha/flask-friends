@@ -12,5 +12,3 @@ def test_create_friendship(strategy, users, app):
         resp = c.open(url, method='POST', headers=headers, 
                       data=dict(email='new_user@ff.com'))
         assert resp.status_code == 401
-
-
