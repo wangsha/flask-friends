@@ -5,7 +5,7 @@ from friends.utils import get_strategy
 from friends.frameworks.flask.routes import friends_blueprint
 
 
-class FlaskFriends(object):
+class Friends(object):
     def __init__(self, app=None, **kwargs):
         self.app = app
         self.strategy_cls = None
