@@ -1,5 +1,4 @@
 from mongoengine import ReferenceField
-from flask_mongoengine import Document
 
 from friends.storagies.mongoengine_storage import BaseMongoengineStorage, MongoenginFriendsMixin, \
     MongoengineFriendInvitationMixin, MongoengineFriendshipRequestMixin, MongoengineUserMixin

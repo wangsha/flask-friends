@@ -1,22 +1,17 @@
-from itsdangerous import URLSafeSerializer
-
-
-def _get_serializer(strategy):
-    serializer = URLSafeSerializer(strategy.encryption_key())
-    return serializer
+from friends.utils import get_serializer
 
 
 def do_invite_friend(strategy, from_user, to_user_email, message):
     storage = strategy.storage
     if storage.user.user_exists(to_user_email):
         to_user = storage.user.get_user_by_email(to_user_email)
-        storage.friendshipRequest.create(from_user=from_user, to_user=to_user,
-                                         message=message)
+        storage.friendshipRequest.create(
+            from_user=from_user, to_user=to_user, message=message)
         payload = {
             'from_user_id': "%s" % storage.user.get_id(from_user),
             'to_user_id': "%s" % storage.user.get_id(to_user)
         }
-        token = _get_serializer(strategy).dumps(payload).encode('utf-8')
+        token = get_serializer(strategy).dumps(payload).encode('utf-8')
         strategy.send_friendship_request_email(from_user=from_user, to_user=to_user,
                                                message=message, authentication_token=token)
     else:
@@ -46,7 +41,7 @@ def new_user_created(strategy, user):
 
 
 def _load_friendship_request(strategy, token):
-    payload = _get_serializer(strategy).loads(token)
+    payload = get_serializer(strategy).loads(token)
     storage = strategy.storage
     from_user = storage.user.get_user_by_id(payload['from_user_id'])
     to_user = storage.user.get_user_by_id(payload['to_user_id'])

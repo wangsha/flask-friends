@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import pytest
-
-from mock import call
-from utils import make_token
+from friends.utils import make_token
 from friends.actions import do_invite_friend, _load_friendship_request,\
     friendship_request_list, accept_friendship_request, new_user_created,\
     reject_friendship_request, cancel_friendship_request, friendlist,\
@@ -20,7 +17,7 @@ def test_do_invite_friend(app, users, friends):
     do_invite_friend(strategy, from_user=from_user,
                      to_user_email=to_user_email,
                      message=message)
-    invitation = strategy.storage.friendInvitation.objects.filter(
+    strategy.storage.friendInvitation.objects.filter(
         from_user=from_user, to_user_email=to_user_email, message="Hello!"
     ).count() > 0
 
@@ -132,7 +129,7 @@ def test_friendship_request_list_rejected(strategy, users):
     res = friendship_request_list_rejected(strategy, user)
     assert len(res['requesting']) == 0
     assert len(res['requested']) == 1
-    
+
     # invite from user
     token, request = _do_invite_return_token_request(
         strategy, user, users[3])

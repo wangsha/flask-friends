@@ -9,6 +9,6 @@ def test_create_friendship(strategy, users, app):
     with app.test_client() as c:
         resp = c.open(url, method='GET', headers=headers)
         assert resp.status_code == 405
-        resp = c.open(url, method='POST', headers=headers, 
+        resp = c.open(url, method='POST', headers=headers,
                       data=dict(email='new_user@ff.com'))
         assert resp.status_code == 401

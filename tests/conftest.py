@@ -9,16 +9,13 @@
 """
 
 import time
-import mock
 import pytest
 
 from flask import Flask
-from flask_mongoengine import MongoEngine, Document
-from mongoengine.fields import StringField, BooleanField
+from flask_mongoengine import MongoEngine
 
 from mongoengine.connection import disconnect
 from friends.strategy import BaseStrategy
-from friends.storagies.mongoengine_storage import MongoengineUserMixin
 from friends.frameworks.flask.routes import friends_blueprint
 from friends.frameworks.flask import FlaskFriends
 
@@ -100,9 +97,11 @@ def friends(app, db, user_cls, strategy_cls):
     yield FlaskFriends(
         app, db=db, user_cls=user_cls, strategy_cls=strategy_cls)
 
+
 @pytest.fixture
 def strategy(friends):
     return friends.get_strategy()
+
 
 @pytest.fixture()
 def app():
