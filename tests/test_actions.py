@@ -10,7 +10,8 @@ from friends.actions import do_invite_friend, _load_friendship_request,\
     friendship_request_list_rejected
 
 
-def test_do_invite_friend(app, users, strategy):
+def test_do_invite_friend(app, users, friends):
+    strategy = friends.get_strategy()
     from_user = users[0]
     message = 'Hello!'
 
@@ -32,13 +33,13 @@ def test_do_invite_friend(app, users, strategy):
         from_user=from_user, to_user=to_user, message=message).count() > 0
 
 
-def test_new_user_created(strategy, users):
+def test_new_user_created(strategy, users, user_cls):
     email = 'newuser@ff.com'
     do_invite_friend(
         strategy, from_user=users[0], to_user_email=email, message='')
     do_invite_friend(
         strategy, from_user=users[1], to_user_email=email, message='')
-    user = strategy.storage.user.objects.create(
+    user = user_cls.objects.create(
         email=email, username='newuser', password='pw')
     new_user_created(strategy, user)
     assert not strategy.storage.friendInvitation.objects

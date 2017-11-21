@@ -13,39 +13,30 @@ import mock
 import pytest
 
 from flask import Flask
-from flask_mongoengine import MongoEngine
+from flask_mongoengine import MongoEngine, Document
+from mongoengine.fields import StringField, BooleanField
 
 from mongoengine.connection import disconnect
 from friends.strategy import BaseStrategy
-from friends.storagies.flask_mongoengine_storage import FlaskMongoengineStorage, init_friends
 from friends.storagies.mongoengine_storage import MongoengineUserMixin
+from friends.frameworks.flask.routes import friends_blueprint
+from friends.frameworks.flask import FlaskFriends
 
 
 @pytest.fixture()
-def flask_mongoengine_storage(app):
+def db(app):
     db_name = 'flask_friends_test_%s' % str(time.time()).replace('.', '_')
     app.config['MONGODB_SETTINGS'] = {
         'db': db_name,
         'host': 'localhost',
-        'port': 27018,
+        'port': 27017,
     }
-    db = MongoEngine(app)
+    _db = MongoEngine(app)
 
-    class User(db.Document, MongoengineUserMixin):
-        email = db.StringField(unique=True, max_length=255)
-        username = db.StringField(max_length=255)
-        password = db.StringField(max_length=255)
-        active = db.BooleanField(default=True)
-
-        USERNAME_FIELD = 'email'
-        meta = {'allow_inheritance': True}
-
-    app.config['FRIENDS_USER_MODEL'] = User
-    init_friends(app, db)
-    yield FlaskMongoengineStorage()
+    yield _db
 
     with app.app_context():
-        db.connection.drop_database(db_name)
+        _db.connection.drop_database(db_name)
         # Mongoengine keep a global state of the connections that must be
         # reset before each test.
         # Given it doesn't expose any method to get the list of registered
@@ -53,9 +44,21 @@ def flask_mongoengine_storage(app):
         disconnect()
 
 
+@pytest.fixture
+def user_cls(db):
+    class User(db.Document):
+        email = db.StringField(unique=True, max_length=255)
+        username = db.StringField(max_length=255)
+        password = db.StringField(max_length=255)
+        active = db.BooleanField(default=True)
+
+        USERNAME_FIELD = 'email'
+        meta = {'allow_inheritance': True}
+    yield User
+
+
 @pytest.fixture()
-def users(app, flask_mongoengine_storage):
-    User = flask_mongoengine_storage.user
+def users(app, user_cls):
     with app.app_context():
         users = [
             ('judy@ff.com', 'judy', None, True),
@@ -66,21 +69,19 @@ def users(app, flask_mongoengine_storage):
             ('bob@ff.com', 'bob', None, False),
         ]
         for u in users:
-            user = User(email=u[0], username=u[1], password=u[2],
-                        active=u[3])
+            user = user_cls(email=u[0], username=u[1], password=u[2],
+                            active=u[3])
             user.save()
-    users = User.objects
-    yield users
-    for u in users:
-        u.delete()
+    return user_cls.objects
 
 
 @pytest.fixture()
-def strategy(flask_mongoengine_storage):
+def strategy_cls(app, db):
     class TestStrategy(BaseStrategy):
 
         def authenticate_request(self, authorization):
-            pass
+            user = self.storage.user.get_user_by_id(authorization)
+            return user
 
         def encryption_key(self):
             return 'IamSoSecret!!'
@@ -91,13 +92,23 @@ def strategy(flask_mongoengine_storage):
         def send_friendship_request_email(self, from_user, to_user, message, authentication_token):
             pass
 
-    strategy = TestStrategy(storage=flask_mongoengine_storage)
-    return strategy
+    return TestStrategy
 
+
+@pytest.fixture
+def friends(app, db, user_cls, strategy_cls):
+    yield FlaskFriends(
+        app, db=db, user_cls=user_cls, strategy_cls=strategy_cls)
+
+@pytest.fixture
+def strategy(friends):
+    return friends.get_strategy()
 
 @pytest.fixture()
 def app():
     _app = Flask(__name__)
     _app.debug = True
     _app.config['TESTING'] = True
-    return _app
+    _app.register_blueprint(friends_blueprint)
+    with _app.app_context():
+        yield _app

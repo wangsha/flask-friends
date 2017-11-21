@@ -14,7 +14,8 @@ friends_blueprint = Blueprint('friends', __name__)
 
 @friends_blueprint.route('/request_friend', methods=('POST',))
 @load_strategy
-def create_friendship(email):
+def create_friendship():
+    email = request.form['email']
     user = g.strategy.authenticate_request(request.headers['Authenticate'])
     if not user:
         abort(401)

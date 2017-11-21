@@ -13,8 +13,8 @@ def do_invite_friend(strategy, from_user, to_user_email, message):
         storage.friendshipRequest.create(from_user=from_user, to_user=to_user,
                                          message=message)
         payload = {
-            'from_user_id': "%s" % from_user.get_id(),
-            'to_user_id': "%s" % to_user.get_id()
+            'from_user_id': "%s" % storage.user.get_id(from_user),
+            'to_user_id': "%s" % storage.user.get_id(to_user)
         }
         token = _get_serializer(strategy).dumps(payload).encode('utf-8')
         strategy.send_friendship_request_email(from_user=from_user, to_user=to_user,
@@ -37,7 +37,7 @@ def new_user_created(strategy, user):
     """
     storage = strategy.storage
     invitations = storage.friendInvitation.get_invitations_by_email(
-        to_user_email=user.get_email())
+        to_user_email=storage.user.get_email(user))
     for invitation in invitations:
         storage.friendshipRequest.create(from_user=invitation.from_user,
                                          to_user=user,
