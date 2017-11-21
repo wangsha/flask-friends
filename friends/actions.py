@@ -1,4 +1,4 @@
-from friends.utils import get_serializer
+from friends.utils import make_token, get_serializer
 
 
 def do_invite_friend(strategy, from_user, to_user_email, message):
@@ -7,11 +7,7 @@ def do_invite_friend(strategy, from_user, to_user_email, message):
         to_user = storage.user.get_user_by_email(to_user_email)
         storage.friendshipRequest.create(
             from_user=from_user, to_user=to_user, message=message)
-        payload = {
-            'from_user_id': "%s" % storage.user.get_id(from_user),
-            'to_user_id': "%s" % storage.user.get_id(to_user)
-        }
-        token = get_serializer(strategy).dumps(payload).encode('utf-8')
+        token = make_token(strategy, from_user, to_user)
         strategy.send_friendship_request_email(from_user=from_user, to_user=to_user,
                                                message=message, authentication_token=token)
     else:

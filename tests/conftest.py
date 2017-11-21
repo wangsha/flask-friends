@@ -16,7 +16,6 @@ from flask_mongoengine import MongoEngine
 
 from mongoengine.connection import disconnect
 from friends.strategy import BaseStrategy
-from friends.frameworks.flask.routes import friends_blueprint
 from friends.frameworks.flask import FlaskFriends
 
 
@@ -108,6 +107,5 @@ def app():
     _app = Flask(__name__)
     _app.debug = True
     _app.config['TESTING'] = True
-    _app.register_blueprint(friends_blueprint)
     with _app.app_context():
         yield _app

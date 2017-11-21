@@ -16,6 +16,7 @@ friends_blueprint = Blueprint('friends', __name__)
 @load_strategy
 def create_friendship():
     email = request.form['email']
+    message = request.form.get('message', '')
     user = g.strategy.authenticate_request(request.headers['Authenticate'])
     if not user:
         abort(401)
@@ -23,8 +24,7 @@ def create_friendship():
     do_invite_friend(g.strategy,
                      from_user=user,
                      to_user_email=email,
-                     message=request.data['message'])
-
+                     message=message)
     return 'Ok', 200
 
 
@@ -53,6 +53,8 @@ def cancel_friend_request(token):
 @load_strategy
 def friend_requests():
     user = g.strategy.authenticate_request(request.headers['Authenticate'])
+    if not user:
+        abort(401)
     res = friendship_request_list(g.strategy, user)
     return jsonify(res)
 
@@ -61,5 +63,7 @@ def friend_requests():
 @load_strategy
 def friend_requests_rejected():
     user = g.strategy.authenticate_request(request.headers['Authenticate'])
+    if not user:
+        abort(401)
     res = friendship_request_list_rejected(g.strategy, user)
     return jsonify(res)
