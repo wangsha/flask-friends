@@ -63,6 +63,17 @@ def test_accept_friendship_request(strategy, users):
     assert strategy.storage.friends.objects.filter(
         user1=from_user, user2=to_user).count() == 1
 
+    # already friends
+    from_user = users[1]
+    to_user = users[2]
+    strategy.storage.friends.create(user1=from_user, user2=to_user)
+    token, request = do_invite_return_token_request(
+        strategy, from_user, to_user)
+    accept_friendship_request(strategy, token)
+    assert not strategy.storage.friendshipRequest.objects.filter(pk=request.id)
+    assert strategy.storage.friends.objects.filter(
+        user1=from_user, user2=to_user).count() == 1
+
 
 def test_reject_friendship_request(strategy, users):
     from_user = users[0]
