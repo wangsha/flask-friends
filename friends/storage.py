@@ -1,17 +1,21 @@
 class UserMixin(object):
     @classmethod
     def get_id(cls, user):
-        """Return the email for given user"""
-        return getattr(user, cls.email_field(), None)
-
-    @classmethod
-    def id_field(cls):
-        return getattr(cls.user_model(), 'ID_FIELD', 'id')
+        """Return the ID for given user"""
+        return getattr(user, cls.id_field(), None)
 
     @classmethod
     def get_email(cls, user):
         """Return the email for given user"""
         return getattr(user, cls.email_field(), None)
+
+    @classmethod
+    def username_field(cls):
+        return getattr(cls.user_model(), 'USERNAME_FIELD', 'username')
+
+    @classmethod
+    def id_field(cls):
+        return getattr(cls.user_model(), 'ID_FIELD', 'id')
 
     @classmethod
     def email_field(cls):

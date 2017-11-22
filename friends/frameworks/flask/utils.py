@@ -22,7 +22,9 @@ def load_strategy(func):
 
     @wraps(func)
     def wrapper(*args, **kwargs):
-        g.strategy = get_strategy(get_helper('FRIENDS_STRATEGY'),
-                                  get_helper('FRIENDS_STORAGE'))
+        g.strategy = get_strategy(
+            current_app.extensions['friends'].strategy_cls,
+            current_app.extensions['friends'].storage
+        )
         return func(*args, **kwargs)
     return wrapper

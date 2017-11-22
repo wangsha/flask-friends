@@ -1,18 +1,12 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from friends.utils import make_token
+from friends.actions import do_invite_friend, _load_friendship_request
 
 
-def create_users(app, flask_mongoengine_storage):
-    User = flask_mongoengine_storage.user
-    with app.app_context():
-        users = [
-            ('judy@ff.com', 'judy', None, True),
-            ('harry@ff.com', 'harry', None, True),
-            ('sha@ff.com', 'sha', None, True),
-            ('walle@ff.com', 'walle', None, True),
-            ('tony@ff.com', 'tony', None, False),
-        ]
-        for u in users:
-            user = User(email=u[0], username=u[1], password=u[2],
-                        active=u[3])
-            user.save()
-    return User.objects
+def do_invite_return_token_request(strategy, from_user, to_user):
+    do_invite_friend(strategy, from_user=from_user,
+                     to_user_email=to_user.email, message="Hello!")
+    token = make_token(strategy, from_user, to_user)
+    request = _load_friendship_request(strategy, token)
+    return token, request

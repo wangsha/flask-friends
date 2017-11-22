@@ -1,4 +1,5 @@
 import sys
+from itsdangerous import URLSafeSerializer
 
 
 def import_module(name):
@@ -12,7 +13,18 @@ def module_member(name):
     return getattr(module, member)
 
 
-def get_strategy(strategy, storage, *args, **kwargs):
-    Strategy = module_member(strategy)
-    Storage = module_member(storage)
-    return Strategy(Storage, *args, **kwargs)
+def get_strategy(strategy_cls, storage, *args, **kwargs):
+    return strategy_cls(storage, *args, **kwargs)
+
+
+def get_serializer(strategy):
+    serializer = URLSafeSerializer(strategy.encryption_key())
+    return serializer
+
+
+def make_token(strategy, from_user, to_user):
+    payload = {
+        'from_user_id': "%s" % strategy.storage.user.get_id(from_user),
+        'to_user_id': "%s" % strategy.storage.user.get_id(to_user)
+    }
+    return get_serializer(strategy).dumps(payload).encode('utf-8')

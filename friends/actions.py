@@ -1,26 +1,19 @@
-from itsdangerous import URLSafeSerializer
-
-
-def _get_serializer(strategy):
-    serializer = URLSafeSerializer(strategy.encryption_key())
-    return serializer
+from friends.utils import make_token, get_serializer
 
 
 def do_invite_friend(strategy, from_user, to_user_email, message):
     storage = strategy.storage
     if storage.user.user_exists(to_user_email):
         to_user = storage.user.get_user_by_email(to_user_email)
-        storage.friendshipRequest.create(from_user=from_user, to_user=to_user, message=message)
-        payload = {
-            'from_user_id': "%s" % from_user.get_id(),
-            'to_user_id': "%s" % to_user.get_id()
-        }
-        token = _get_serializer(strategy).dumps(payload).encode('utf-8')
+        storage.friendshipRequest.create(
+            from_user=from_user, to_user=to_user, message=message)
+        token = make_token(strategy, from_user, to_user)
         strategy.send_friendship_request_email(from_user=from_user, to_user=to_user,
                                                message=message, authentication_token=token)
     else:
-        storage.friendshipInvitation.create(from_user=from_user, to_user_email=to_user_email,
-                                            message=message)
+        storage.friendInvitation.create(from_user=from_user,
+                                        to_user_email=to_user_email,
+                                        message=message)
         strategy.send_friendship_invitation_email(from_user=from_user,
                                                   to_user_email=to_user_email,
                                                   message=message)
@@ -34,17 +27,17 @@ def new_user_created(strategy, user):
     :return:
     """
     storage = strategy.storage
-    invitations = storage.friendshipInvitation.get_invitations_by_email(
-        to_user_email=storage.friendshipInvitation.get_email(user))
+    invitations = storage.friendInvitation.get_invitations_by_email(
+        to_user_email=storage.user.get_email(user))
     for invitation in invitations:
         storage.friendshipRequest.create(from_user=invitation.from_user,
                                          to_user=user,
                                          message=invitation.message)
-        storage.friendshipInvitation.remove(invitation.id)
+        storage.friendInvitation.remove(invitation.id)
 
 
 def _load_friendship_request(strategy, token):
-    payload = _get_serializer(strategy).loads(token)
+    payload = get_serializer(strategy).loads(token)
     storage = strategy.storage
     from_user = storage.user.get_user_by_id(payload['from_user_id'])
     to_user = storage.user.get_user_by_id(payload['to_user_id'])
