@@ -74,7 +74,7 @@ def users(app, user_cls):
 
 
 @pytest.fixture()
-def strategy_cls(app, db):
+def strategy_cls(app, db, user_cls):
     class TestStrategy(BaseStrategy):
 
         def authenticate_request(self, authorization):
