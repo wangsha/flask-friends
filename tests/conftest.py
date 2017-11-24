@@ -78,7 +78,8 @@ def strategy_cls(app, db):
     class TestStrategy(BaseStrategy):
 
         def authenticate_request(self, authorization):
-            user = self.storage.user.get_user_by_id(authorization)
+            # pretend it's authorized
+            user = user_cls.object().first()
             return user
 
         def encryption_key(self):
