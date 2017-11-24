@@ -15,6 +15,8 @@ from flask import Flask
 from flask_mongoengine import MongoEngine
 
 from mongoengine.connection import disconnect
+
+from friends.frameworks.flask.routes import friends_blueprint
 from friends.strategy import BaseStrategy
 from friends.frameworks.flask import Friends
 
@@ -93,8 +95,10 @@ def strategy_cls(app, db):
 
 @pytest.fixture
 def friends(app, db, user_cls, strategy_cls):
-    yield Friends(
+    friends = Friends(
         app, db=db, user_cls=user_cls, strategy_cls=strategy_cls)
+    app.register_blueprint(friends_blueprint)
+    return friends
 
 
 @pytest.fixture
