@@ -11,7 +11,7 @@ from friends.actions import do_invite_friend, reject_friendship_request, accept_
 new_user_headers = {'AUTHORIZATION': binascii.hexlify('id1234567890')}
 
 
-def test_create_friendship(app, users, strategy):
+def test_create_friendship(app, friends, users):
     # request with does not exists user
     resp = _test_create_friendship(app, new_user_headers,
                                    dict(email='new_user@ff.com', message=''))
