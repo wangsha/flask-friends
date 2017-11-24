@@ -99,7 +99,6 @@ def strategy_cls(app, db):
 def friends(app, db, user_cls, strategy_cls):
     friends = Friends(
         app, db=db, user_cls=user_cls, strategy_cls=strategy_cls)
-    app.register_blueprint(friends_blueprint)
     return friends
 
 
@@ -113,5 +112,6 @@ def app():
     _app = Flask(__name__)
     _app.debug = True
     _app.config['TESTING'] = True
+    _app.register_blueprint(friends_blueprint)
     with _app.app_context():
         yield _app

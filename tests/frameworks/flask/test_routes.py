@@ -8,29 +8,40 @@ from friends.utils import make_token
 from friends.actions import do_invite_friend, reject_friendship_request, accept_friendship_request
 
 
-new_user_headers = {'Authenticate': binascii.hexlify('id1234567890')}
+new_user_headers = {'AUTHORIZATION': binascii.hexlify('id1234567890')}
 
 
-def test_create_friendship(strategy, users, app):
+def test_create_friendship(app, users, strategy):
+    # request with does not exists user
+    resp = _test_create_friendship(app, new_user_headers,
+                                   dict(email='new_user@ff.com', message=''))
+    assert resp.status_code == 401
+
+    # request with exists user
+    user = users[0]
+    headers = {'AUTHORIZATION': user.id}
+    # miss parameter message
+    resp = _test_create_friendship(app, headers, dict(email='new_user@ff.com'))
+    assert resp.status_code == 400
+    # miss parameter email
+    resp = _test_create_friendship(app, headers, dict(message=''))
+    assert resp.status_code == 400
+
+    resp = _test_create_friendship(app, headers,
+                                   dict(email='new_user@ff.com', message=''))
+    assert resp.status_code == 200
+    assert resp.data == 'Ok'
+    resp = _test_create_friendship(app, headers,
+                                   dict(email=users[1], message=''))
+    assert resp.status_code == 200
+    assert resp.data == 'Ok'
+
+
+def _test_create_friendship(app, headers, post_data):
     url = '/request_friend'
-
     with app.test_client() as c:
-        # request with does not exists user
-        resp = c.post(url, headers=new_user_headers,
-                      data=dict(email='new_user@ff.com'))
-        assert resp.status_code == 401
-
-        # request with exists user
-        user = users[0]
-        headers = {'Authenticate': user.id}
-        resp = c.post(url, headers=headers,
-                      data=dict(email='new_user@ff.com'))
-        assert resp.status_code == 200
-        assert resp.data == 'Ok'
-        resp = c.post(url, headers=headers,
-                      data=dict(email=users[1].email))
-        assert resp.status_code == 200
-        assert resp.data == 'Ok'
+        resp = c.post(url, headers=headers, data=post_data)
+        return resp
 
 
 def test_accept_friend_request(strategy, users, app):
@@ -82,7 +93,7 @@ def test_friend_requests(strategy, users, app):
 
         # request with exists user
         user = users[0]
-        headers = {'Authenticate': user.id}
+        headers = {'AUTHORIZATION': user.id}
         do_invite_friend(strategy, users[1], user.email, '')
         do_invite_friend(strategy, users[2], user.email, '')
         do_invite_friend(strategy, user, users[3].email, '')
@@ -103,7 +114,7 @@ def test_friend_requests_rejected(strategy, users, app):
 
         # request with exists user
         user = users[0]
-        headers = {'Authenticate': user.id}
+        headers = {'AUTHORIZATION': user.id}
         resp = c.get(url, headers=headers)
         assert resp.status_code == 200
         data = json.loads(resp.data)
