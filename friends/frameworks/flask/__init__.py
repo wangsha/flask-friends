@@ -17,7 +17,6 @@ class Friends(object):
         init_friends(app, db, user_cls)
         self.storage = FlaskMongoengineStorage
         self.strategy_cls = strategy_cls
-        app.register_blueprint(friends_blueprint)
         app.extensions['friends'] = self
 
     def get_strategy(self):

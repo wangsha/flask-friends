@@ -5,8 +5,8 @@ from flask import current_app, g
 from friends.utils import get_strategy, module_member
 
 DEFAULTS = {
-    'FRIENDS_STORAGE': 'social_flask_sqlalchemy.models.FlaskStorage',
-    'FRIENDS_STRATEGY': 'social_flask.strategy.FlaskStrategy'
+    'FRIENDS_STORAGE': 'friends.storagies.FlaskMongoengineStorage',
+    'FRIENDS_STRATEGY': 'friends.strategy.BaseStrategy'
 }
 
 

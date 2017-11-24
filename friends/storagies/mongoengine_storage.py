@@ -13,14 +13,14 @@ class MongoengineUserMixin(UserMixin):
         Return True/False if a User instance exists with the given email.
         """
         flt = dict()
-        flt[cls.username_field()] = email
+        flt[cls.email_field()] = email
         return cls.user_model().objects.filter(**flt).count() > 0
 
     @classmethod
     def get_user_by_email(cls, email):
         """Return users instance for given email address"""
         flt = dict()
-        flt[cls.username_field()] = email
+        flt[cls.email_field()] = email
         return cls.user_model().objects.filter(**flt).first()
 
     @classmethod
