@@ -15,7 +15,7 @@ friends_blueprint = Blueprint('friends', __name__)
 @friends_blueprint.route('/request_friend', methods=('POST',))
 @load_strategy
 def create_friendship():
-    user = g.strategy.authenticate_request(request.headers.get('AUTHORIZATION', ''))
+    user = g.strategy.authenticate_request(request.headers.get('AUTHORIZATION', None))
     if not user:
         abort(401)
 
@@ -53,7 +53,7 @@ def cancel_friend_request(token):
 @friends_blueprint.route('/friend_requests', methods=('GET',))
 @load_strategy
 def friend_requests():
-    user = g.strategy.authenticate_request(request.headers.get('AUTHORIZATION', ''))
+    user = g.strategy.authenticate_request(request.headers.get('AUTHORIZATION', None))
     if not user:
         abort(401)
     res = friendship_request_list(g.strategy, user)
@@ -63,7 +63,7 @@ def friend_requests():
 @friends_blueprint.route('/friend_requests_rejected', methods=('GET',))
 @load_strategy
 def friend_requests_rejected():
-    user = g.strategy.authenticate_request(request.headers.get('AUTHORIZATION', ''))
+    user = g.strategy.authenticate_request(request.headers.get('AUTHORIZATION', None))
     if not user:
         abort(401)
     res = friendship_request_list_rejected(g.strategy, user)

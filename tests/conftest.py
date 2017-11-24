@@ -74,12 +74,13 @@ def users(app, user_cls):
 
 
 @pytest.fixture()
-def strategy_cls(app, db, user_cls):
+def strategy_cls(app, db):
     class TestStrategy(BaseStrategy):
 
         def authenticate_request(self, authorization):
-            # pretend it's authorized
-            user = user_cls.object().first()
+            if not authorization:
+                return None
+            user = self.storage.user.get_user_by_id(authorization)
             return user
 
         def encryption_key(self):
