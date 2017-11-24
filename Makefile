@@ -20,7 +20,7 @@ install: clean
 lint:
 	flake8
 
-test .coverage:
+test .coverage: lint
 	pytest --cov-report=term:skip-covered --cov=friends --cov-branch
 
 cov: .coverage

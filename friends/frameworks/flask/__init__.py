@@ -2,7 +2,6 @@ from friends.storagies.flask_mongoengine_storage import (
     init_friends, FlaskMongoengineStorage,
 )
 from friends.utils import get_strategy
-from friends.frameworks.flask.routes import friends_blueprint
 
 
 class Friends(object):
