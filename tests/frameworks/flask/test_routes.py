@@ -30,11 +30,9 @@ def test_create_friendship(app, friends, users):
     resp = _test_create_friendship(app, headers,
                                    dict(email='new_user@ff.com', message=''))
     assert resp.status_code == 200
-    assert resp.data == 'Ok'
     resp = _test_create_friendship(app, headers,
-                                   dict(email=users[1], message=''))
+                                   dict(email=users[1].email, message=''))
     assert resp.status_code == 200
-    assert resp.data == 'Ok'
 
 
 def _test_create_friendship(app, headers, post_data):
@@ -54,7 +52,6 @@ def test_accept_friend_request(strategy, users, app):
     with app.test_client() as c:
         resp = c.post(url)
         assert resp.status_code == 200
-        assert resp.data == 'Ok'
 
 
 def test_reject_friend_request(strategy, users, app):
@@ -67,7 +64,6 @@ def test_reject_friend_request(strategy, users, app):
     with app.test_client() as c:
         resp = c.post(url)
         assert resp.status_code == 200
-        assert resp.data == 'Ok'
 
 
 def test_cancel_friend_request(strategy, users, app):
@@ -80,7 +76,6 @@ def test_cancel_friend_request(strategy, users, app):
     with app.test_client() as c:
         resp = c.post(url)
         assert resp.status_code == 200
-        assert resp.data == 'Ok'
 
 
 def test_friend_requests(strategy, users, app):
