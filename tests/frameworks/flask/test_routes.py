@@ -5,6 +5,7 @@ import binascii
 
 from utils import do_invite_return_token_request
 from friends.utils import make_token
+from friends.frameworks.flask.routes import okay_response
 from friends.actions import do_invite_friend, reject_friendship_request, accept_friendship_request
 
 
@@ -30,9 +31,11 @@ def test_create_friendship(app, friends, users):
     resp = _test_create_friendship(app, headers,
                                    dict(email='new_user@ff.com', message=''))
     assert resp.status_code == 200
+    assert resp.data == okay_response()
     resp = _test_create_friendship(app, headers,
                                    dict(email=users[1].email, message=''))
     assert resp.status_code == 200
+    assert resp.data == okay_response()
 
 
 def _test_create_friendship(app, headers, post_data):
@@ -52,6 +55,7 @@ def test_accept_friend_request(strategy, users, app):
     with app.test_client() as c:
         resp = c.post(url)
         assert resp.status_code == 200
+        assert resp.data == okay_response()
 
 
 def test_reject_friend_request(strategy, users, app):
@@ -64,6 +68,7 @@ def test_reject_friend_request(strategy, users, app):
     with app.test_client() as c:
         resp = c.post(url)
         assert resp.status_code == 200
+        assert resp.data == okay_response()
 
 
 def test_cancel_friend_request(strategy, users, app):
@@ -76,6 +81,7 @@ def test_cancel_friend_request(strategy, users, app):
     with app.test_client() as c:
         resp = c.post(url)
         assert resp.status_code == 200
+        assert resp.data == okay_response()
 
 
 def test_friend_requests(strategy, users, app):
