@@ -11,6 +11,7 @@ from friends.frameworks.flask.utils import load_strategy
 
 friends_blueprint = Blueprint('friends', __name__)
 
+
 def okay_response():
     resp = """
     <!DOCTYPE html>
@@ -91,6 +92,7 @@ def okay_response():
 </html>
     """
     return resp
+
 
 @friends_blueprint.route('/request_friend', methods=('POST',))
 @load_strategy
