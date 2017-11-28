@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 
-from flask import Blueprint, g, request, jsonify
+from flask import Blueprint, g, request
 from werkzeug.exceptions import abort
 
 from friends.actions import do_invite_friend, \
     accept_friendship_request, reject_friendship_request, cancel_friendship_request, \
-    friendship_request_list, friendship_request_list_rejected
+    friendship_request_list, friendship_request_list_rejected, friendship_invitation_list
 from friends.frameworks.flask.utils import load_strategy
-
 
 friends_blueprint = Blueprint('friends', __name__)
 
@@ -132,6 +131,16 @@ def cancel_friend_request(token):
     return okay_response(), 200
 
 
+@friends_blueprint.route('/friend_invitations', methods=('GET',))
+@load_strategy
+def friend_invitations():
+    user = g.strategy.authenticate_request(request.headers.get('AUTHORIZATION', None))
+    if not user:
+        abort(401)
+    res = friendship_invitation_list(g.strategy, user)
+    return g.strategy.make_response(res)
+
+
 @friends_blueprint.route('/friend_requests', methods=('GET',))
 @load_strategy
 def friend_requests():
@@ -139,7 +148,7 @@ def friend_requests():
     if not user:
         abort(401)
     res = friendship_request_list(g.strategy, user)
-    return jsonify(res)
+    return g.strategy.make_response(res)
 
 
 @friends_blueprint.route('/friend_requests_rejected', methods=('GET',))
@@ -149,4 +158,4 @@ def friend_requests_rejected():
     if not user:
         abort(401)
     res = friendship_request_list_rejected(g.strategy, user)
-    return jsonify(res)
+    return g.strategy.make_response(res)

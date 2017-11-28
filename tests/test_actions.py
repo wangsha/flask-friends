@@ -40,8 +40,7 @@ def test_new_user_created(strategy, users, user_cls):
     new_user_created(strategy, user)
     assert not strategy.storage.friendInvitation.objects
     res = friendship_request_list(strategy, user)
-    assert len(res['requesting']) == 0
-    assert len(res['requested']) == 2
+    assert len(res) == 2
 
 
 def test_load_friendship_request(strategy, users):
@@ -104,18 +103,15 @@ def test_friendship_request_list(users, strategy):
     do_invite_friend(
         strategy, from_user=users[2], to_user_email=user_a.email, message='')
     res = friendship_request_list(strategy, user_a)
-    assert len(res['requesting']) == 0
-    assert len(res['requested']) == 2
+    assert len(res) == 2
 
     # 1 invite from user_a to user_b
     do_invite_friend(
         strategy, from_user=user_a, to_user_email=user_b.email, message='')
     res = friendship_request_list(strategy, user_a)
-    assert len(res['requesting']) == 1
-    assert len(res['requested']) == 2
+    assert len(res) == 3
     res = friendship_request_list(strategy, user_b)
-    assert len(res['requesting']) == 0
-    assert len(res['requested']) == 1
+    assert len(res) == 1
 
 
 def test_friendship_request_list_rejected(strategy, users):
@@ -129,8 +125,7 @@ def test_friendship_request_list_rejected(strategy, users):
         strategy, users[2], user)
     accept_friendship_request(strategy, token)
     res = friendship_request_list_rejected(strategy, user)
-    assert len(res['requesting']) == 0
-    assert len(res['requested']) == 1
+    assert len(res) == 1
 
     # invite from user
     token, request = do_invite_return_token_request(
@@ -140,8 +135,7 @@ def test_friendship_request_list_rejected(strategy, users):
         strategy, user, users[4])
     accept_friendship_request(strategy, token)
     res = friendship_request_list_rejected(strategy, user)
-    assert len(res['requesting']) == 1
-    assert len(res['requested']) == 1
+    assert len(res) == 2
 
 
 def test_friendlist(strategy, users):

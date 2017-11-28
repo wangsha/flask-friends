@@ -49,6 +49,10 @@ class MongoengineFriendInvitationMixin(FriendInvitationMixin):
         return cls.objects.filter(to_user_email=to_user_email)
 
     @classmethod
+    def get_invitations_by_from_user(cls, from_user):
+        return cls.objects.filter(from_user=from_user)
+
+    @classmethod
     def remove(cls, *ids_to_delete):
         cls.objects.filter(pk__in=ids_to_delete).delete()
 

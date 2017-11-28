@@ -8,7 +8,6 @@ from friends.utils import make_token
 from friends.frameworks.flask.routes import okay_response
 from friends.actions import do_invite_friend, reject_friendship_request, accept_friendship_request
 
-
 new_user_headers = {'AUTHORIZATION': binascii.hexlify('id1234567890')}
 
 
@@ -101,8 +100,7 @@ def test_friend_requests(strategy, users, app):
         resp = c.get(url, headers=headers)
         assert resp.status_code == 200
         data = json.loads(resp.data)
-        assert len(data['requesting']) == 1
-        assert len(data['requested']) == 2
+        assert len(data) == 3
 
 
 def test_friend_requests_rejected(strategy, users, app):
@@ -119,8 +117,7 @@ def test_friend_requests_rejected(strategy, users, app):
         resp = c.get(url, headers=headers)
         assert resp.status_code == 200
         data = json.loads(resp.data)
-        assert data['requesting'] == []
-        assert data['requested'] == []
+        assert len(data) == 0
 
         token, request = do_invite_return_token_request(
             strategy, users[1], user)
@@ -137,5 +134,4 @@ def test_friend_requests_rejected(strategy, users, app):
         resp = c.get(url, headers=headers)
         assert resp.status_code == 200
         data = json.loads(resp.data)
-        assert len(data['requesting']) == 1
-        assert len(data['requested']) == 1
+        assert len(data) == 2

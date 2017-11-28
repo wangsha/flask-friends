@@ -11,7 +11,7 @@
 import time
 import pytest
 
-from flask import Flask
+from flask import Flask, jsonify
 from flask_mongoengine import MongoEngine
 
 from mongoengine.connection import disconnect
@@ -82,6 +82,9 @@ def strategy_cls(app, db):
                 return None
             user = self.storage.user.get_user_by_id(authorization)
             return user
+
+        def make_response(self, results):
+            return jsonify(results)
 
         def encryption_key(self):
             return 'IamSoSecret!!'
