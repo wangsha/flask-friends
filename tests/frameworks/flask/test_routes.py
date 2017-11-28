@@ -52,7 +52,7 @@ def test_accept_friend_request(strategy, users, app):
     url = '/accept/{token}'.format(token=token)
 
     with app.test_client() as c:
-        resp = c.post(url)
+        resp = c.get(url)
         assert resp.status_code == 200
         assert resp.data == okay_response()
 
@@ -65,7 +65,7 @@ def test_reject_friend_request(strategy, users, app):
     url = '/reject/{token}'.format(token=token)
 
     with app.test_client() as c:
-        resp = c.post(url)
+        resp = c.get(url)
         assert resp.status_code == 200
         assert resp.data == okay_response()
 
@@ -78,7 +78,7 @@ def test_cancel_friend_request(strategy, users, app):
     url = '/cancel/{token}'.format(token=token)
 
     with app.test_client() as c:
-        resp = c.post(url)
+        resp = c.get(url)
         assert resp.status_code == 200
         assert resp.data == okay_response()
 

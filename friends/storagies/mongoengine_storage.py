@@ -121,13 +121,20 @@ class MongoenginFriendsMixin(FriendsMixin):
         return obj
 
     @classmethod
+    def remove_friend(cls, user1, user2):
+        query1 = Q(user1=user1, user2=user2)
+        query2 = Q(user1=user2, user2=user1)
+        res = cls.objects.filter(query1 | query2).delete()
+        return res
+
+    @classmethod
     def get_friends(cls, user):
         res = cls.objects.filter(Q(user1=user) | Q(user2=user))
         return res
 
     @classmethod
     def remove(cls, *ids_to_delete):
-        return cls.objects.filter(pk__in=ids_to_delete).update(set__rejected_at=datetime.utcnow())
+        return cls.objects.filter(pk__in=ids_to_delete).delete()
 
 
 class BaseMongoengineStorage(BaseStorage):

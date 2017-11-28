@@ -132,6 +132,11 @@ class FriendsMixin(object):
         raise NotImplementedError('Implement in subclass')
 
     @classmethod
+    def remove_friend(cls, user1, user2):
+        """Create a friends relaship"""
+        raise NotImplementedError('Implement in subclass')
+
+    @classmethod
     def get_friends(cls, user):
         """Return friends with given user"""
         raise NotImplementedError('Implement in subclass')

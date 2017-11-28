@@ -89,3 +89,16 @@ def friendlist(strategy, user):
     storage = strategy.storage
     res = storage.friends.get_friends(user=user)
     return res
+
+
+def delete_friend(strategy, token):
+    storage = strategy.storage
+    payload = get_serializer(strategy).loads(token)
+    storage = strategy.storage
+    user1 = storage.user.get_user_by_id(payload['from_user_id'])
+    user2 = storage.user.get_user_by_id(payload['to_user_id'])
+    res = storage.friends.remove_friend(
+        user1,
+        user2
+    )
+    return res

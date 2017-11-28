@@ -5,7 +5,8 @@ from werkzeug.exceptions import abort
 
 from friends.actions import do_invite_friend, \
     accept_friendship_request, reject_friendship_request, cancel_friendship_request, \
-    friendship_request_list, friendship_request_list_rejected, friendship_invitation_list
+    friendship_request_list, friendship_request_list_rejected, friendship_invitation_list, \
+    friendlist, delete_friend
 from friends.frameworks.flask.utils import load_strategy
 
 friends_blueprint = Blueprint('friends', __name__)
@@ -110,25 +111,34 @@ def create_friendship():
     return okay_response(), 200
 
 
-@friends_blueprint.route('/accept/<string:token>', methods=('POST',))
+@friends_blueprint.route('/accept/<string:token>', methods=('GET',))
 @load_strategy
 def accept_friend_request(token):
-    accept_friendship_request(g.strategy, token)
-    return okay_response(), 200
+    try:
+        accept_friendship_request(g.strategy, token)
+        return okay_response(), 200
+    except Exception as e:
+        return e.message, 400
 
 
-@friends_blueprint.route('/reject/<string:token>', methods=('POST',))
+@friends_blueprint.route('/reject/<string:token>', methods=('GET',))
 @load_strategy
 def reject_friend_request(token):
-    reject_friendship_request(g.strategy, token)
-    return okay_response(), 200
+    try:
+        reject_friendship_request(g.strategy, token)
+        return okay_response(), 200
+    except Exception as e:
+        return e.message, 400
 
 
-@friends_blueprint.route('/cancel/<string:token>', methods=('POST',))
+@friends_blueprint.route('/cancel/<string:token>', methods=('GET',))
 @load_strategy
 def cancel_friend_request(token):
-    cancel_friendship_request(g.strategy, token)
-    return okay_response(), 200
+    try:
+        cancel_friendship_request(g.strategy, token)
+        return okay_response(), 200
+    except Exception as e:
+        return e.message, 400
 
 
 @friends_blueprint.route('/friend_invitations', methods=('GET',))
@@ -159,3 +169,23 @@ def friend_requests_rejected():
         abort(401)
     res = friendship_request_list_rejected(g.strategy, user)
     return g.strategy.make_response(res)
+
+
+@friends_blueprint.route('/friendlist', methods=('GET',))
+@load_strategy
+def friends():
+    user = g.strategy.authenticate_request(request.headers.get('AUTHORIZATION', None))
+    if not user:
+        abort(401)
+    res = friendlist(g.strategy, user)
+    return g.strategy.make_response(res)
+
+
+@friends_blueprint.route('/remove/<string:token>', methods=('GET',))
+@load_strategy
+def remove_friend(token):
+    try:
+        delete_friend(g.strategy, token)
+        return okay_response(), 200
+    except Exception as e:
+        return e.message, 400
