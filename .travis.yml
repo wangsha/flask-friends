@@ -12,3 +12,7 @@ script:
 
 services:
   - mongodb
+  
+ 
+notifications:
+  slack: detalytics:HNla49jJoqcdkdr0rM3NrQfM
