@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
+from mock import Mock
 
 from utils import do_invite_return_token_request
+from friends.utils import make_token
 from friends.actions import do_invite_friend, friendship_request_list,\
     accept_friendship_request, new_user_created, reject_friendship_request,\
-    cancel_friendship_request, friendlist, friendship_request_list_rejected
+    cancel_friendship_request, friendlist, friendship_request_list_rejected,\
+    delete_friend, friendship_invitation_list
 
 
 def test_do_invite_friend(app, users, friends):
@@ -13,10 +16,13 @@ def test_do_invite_friend(app, users, friends):
 
     # to_user does not exists
     to_user_email = 'idontexist@ff.com'
+    mock_invitation_email = Mock()
+    strategy.send_friendship_invitation_email = mock_invitation_email
     do_invite_friend(strategy, from_user=from_user,
                      to_user_email=to_user_email,
                      message=message)
-    strategy.storage.friendInvitation.objects.filter(
+    assert mock_invitation_email.call_count == 1
+    assert strategy.storage.friendInvitation.objects.filter(
         from_user=from_user, to_user_email=to_user_email, message="Hello!"
     ).count() > 0
 
@@ -151,4 +157,36 @@ def test_friendlist(strategy, users):
     token, request = do_invite_return_token_request(strategy, users[4], user)
     reject_friendship_request(strategy, token)
     res = friendlist(strategy, user)
+    assert len(res) == 2
+
+
+def test_delete_friend(strategy, users):
+    from_user = users[0]
+    strategy.storage.friends.create(from_user, user2=users[1])
+    strategy.storage.friends.create(from_user, user2=users[2])
+
+    token = make_token(strategy, from_user, users[1])
+    delete_friend(strategy, token)
+    res = friendlist(strategy, user=from_user)
+    assert len(res) == 1
+
+    token = make_token(strategy, from_user, users[2])
+    delete_friend(strategy, token)
+    res = friendlist(strategy, user=from_user)
+    assert len(res) == 0
+
+
+def test_friendship_invitation_list(strategy, users):
+    from_user = users[0]
+    res = friendship_invitation_list(strategy, from_user)
+    assert len(res) == 0
+    do_invite_friend(strategy, from_user, users[1].email, 'Hi!')
+    do_invite_friend(strategy, from_user, 'aa@ff.com', 'Hi!')
+    res = friendship_invitation_list(strategy, from_user)
+    assert len(res) == 1
+    do_invite_friend(strategy, from_user, 'aa@ff.com', 'Hi!')
+    res = friendship_invitation_list(strategy, from_user)
+    assert len(res) == 1
+    do_invite_friend(strategy, from_user, 'bb@ff.com', 'Hi!')
+    res = friendship_invitation_list(strategy, from_user)
     assert len(res) == 2

@@ -94,6 +94,10 @@ def test_friend_requests(strategy, users, app):
         # request with exists user
         user = users[0]
         headers = {'AUTHORIZATION': user.id}
+        resp = c.get(url, headers=headers)
+        data = json.loads(resp.data)
+        assert resp.status_code == 200
+        assert len(data) == 0
         do_invite_friend(strategy, users[1], user.email, '')
         do_invite_friend(strategy, users[2], user.email, '')
         do_invite_friend(strategy, user, users[3].email, '')
