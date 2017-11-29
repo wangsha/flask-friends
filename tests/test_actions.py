@@ -28,9 +28,12 @@ def test_do_invite_friend(app, users, friends):
 
     # to_user exists
     to_user = users[1]
+    mock_request_email = Mock()
+    strategy.send_friendship_request_email = mock_request_email
     do_invite_friend(strategy, from_user=from_user,
                      to_user_email=to_user.email,
                      message=message)
+    assert mock_request_email.call_count == 1
     assert strategy.storage.friendshipRequest.objects.filter(
         from_user=from_user, to_user=to_user, message=message).count() > 0
 
