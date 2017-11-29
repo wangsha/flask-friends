@@ -49,6 +49,10 @@ class MongoengineFriendInvitationMixin(FriendInvitationMixin):
         return cls.objects.filter(to_user_email=to_user_email)
 
     @classmethod
+    def get_invitations_by_from_user(cls, from_user):
+        return cls.objects.filter(from_user=from_user)
+
+    @classmethod
     def remove(cls, *ids_to_delete):
         cls.objects.filter(pk__in=ids_to_delete).delete()
 
@@ -117,13 +121,20 @@ class MongoenginFriendsMixin(FriendsMixin):
         return obj
 
     @classmethod
+    def remove_friend(cls, user1, user2):
+        query1 = Q(user1=user1, user2=user2)
+        query2 = Q(user1=user2, user2=user1)
+        res = cls.objects.filter(query1 | query2).delete()
+        return res
+
+    @classmethod
     def get_friends(cls, user):
         res = cls.objects.filter(Q(user1=user) | Q(user2=user))
         return res
 
     @classmethod
     def remove(cls, *ids_to_delete):
-        return cls.objects.filter(pk__in=ids_to_delete).update(set__rejected_at=datetime.utcnow())
+        return cls.objects.filter(pk__in=ids_to_delete).delete()
 
 
 class BaseMongoengineStorage(BaseStorage):

@@ -65,6 +65,11 @@ class FriendInvitationMixin(object):
         raise NotImplementedError('Implement in subclass')
 
     @classmethod
+    def get_invitations_by_from_user(cls, from_user):
+        """Return friendship invitations with given from_user   """
+        raise NotImplementedError('Implement in subclass')
+
+    @classmethod
     def remove(cls, ids_to_delete):
         """Remove objects with given ids"""
         raise NotImplementedError('Implement in subclass')
@@ -123,6 +128,11 @@ class FriendsMixin(object):
 
     @classmethod
     def create(cls, user1, user2):
+        """Create a friends relaship"""
+        raise NotImplementedError('Implement in subclass')
+
+    @classmethod
+    def remove_friend(cls, user1, user2):
         """Create a friends relaship"""
         raise NotImplementedError('Implement in subclass')
 

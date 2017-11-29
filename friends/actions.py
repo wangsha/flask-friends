@@ -67,23 +67,38 @@ def cancel_friendship_request(strategy, token):
 
 def friendship_request_list(strategy, user):
     storage = strategy.storage
-    res = {
-        'requesting': storage.friendshipRequest.get_request_by_from_user(from_user=user),
-        'requested': storage.friendshipRequest.get_request_by_to_user(to_user=user)
-    }
+    res = list(storage.friendshipRequest.get_request_by_from_user(from_user=user)) \
+        + list(storage.friendshipRequest.get_request_by_to_user(to_user=user))
+    return res
+
+
+def friendship_invitation_list(strategy, user):
+    storage = strategy.storage
+    res = storage.friendInvitation.get_invitations_by_from_user(from_user=user)
     return res
 
 
 def friendship_request_list_rejected(strategy, user):
     storage = strategy.storage
-    res = {
-        'requesting': storage.friendshipRequest.get_rejected_request_by_from_user(from_user=user),
-        'requested': storage.friendshipRequest.get_rejected_request_by_to_user(to_user=user)
-    }
+    res = list(storage.friendshipRequest.get_rejected_request_by_from_user(from_user=user)) \
+        + list(storage.friendshipRequest.get_rejected_request_by_to_user(to_user=user))
     return res
 
 
 def friendlist(strategy, user):
     storage = strategy.storage
     res = storage.friends.get_friends(user=user)
+    return res
+
+
+def delete_friend(strategy, token):
+    storage = strategy.storage
+    payload = get_serializer(strategy).loads(token)
+    storage = strategy.storage
+    user1 = storage.user.get_user_by_id(payload['from_user_id'])
+    user2 = storage.user.get_user_by_id(payload['to_user_id'])
+    res = storage.friends.remove_friend(
+        user1,
+        user2
+    )
     return res

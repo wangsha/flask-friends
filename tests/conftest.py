@@ -11,10 +11,12 @@
 import time
 import pytest
 
-from flask import Flask
+from flask import Flask, jsonify
 from flask_mongoengine import MongoEngine
 
 from mongoengine.connection import disconnect
+
+from friends.frameworks.flask.routes import friends_blueprint
 from friends.strategy import BaseStrategy
 from friends.frameworks.flask import Friends
 
@@ -76,8 +78,13 @@ def strategy_cls(app, db):
     class TestStrategy(BaseStrategy):
 
         def authenticate_request(self, authorization):
+            if not authorization:
+                return None
             user = self.storage.user.get_user_by_id(authorization)
             return user
+
+        def make_response(self, results):
+            return jsonify(results)
 
         def encryption_key(self):
             return 'IamSoSecret!!'
@@ -93,8 +100,9 @@ def strategy_cls(app, db):
 
 @pytest.fixture
 def friends(app, db, user_cls, strategy_cls):
-    yield Friends(
+    friends = Friends(
         app, db=db, user_cls=user_cls, strategy_cls=strategy_cls)
+    return friends
 
 
 @pytest.fixture
@@ -107,5 +115,6 @@ def app():
     _app = Flask(__name__)
     _app.debug = True
     _app.config['TESTING'] = True
+    _app.register_blueprint(friends_blueprint)
     with _app.app_context():
         yield _app
