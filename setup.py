@@ -8,7 +8,7 @@ except IOError:
 
 setup(
     name="flask-friends",
-    version="0.4.0",
+    version="0.5.0",
     description="A flask extension for creating and managing friend relations",
     license="MIT",
     author="Sha",
