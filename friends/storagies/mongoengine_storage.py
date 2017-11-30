@@ -67,8 +67,9 @@ class MongoengineFriendshipRequestMixin(FriendshipRequestMixin):
     def create(cls, from_user, to_user, message=None):
         """Create a friendship request"""
         # TODO: handle existing to_user friend from_user
-        obj = cls.objects(from_user=from_user, to_user=to_user)\
-            .upsert_one(set__message=message)
+        obj = cls.objects(
+            from_user=from_user, to_user=to_user
+        ).upsert_one(set__message=message, rejected_at=None)
         return obj
 
     @classmethod
