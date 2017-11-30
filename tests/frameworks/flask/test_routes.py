@@ -57,10 +57,14 @@ def test_accept_friend_request(strategy, users, app):
     from_user = users[0]
     to_user = users[1]
     do_invite_friend(strategy, from_user, to_user.email, 'Hello!')
-    token = make_token(strategy, from_user, to_user)
-    url = '/accept/{token}'.format(token=token)
-
     with app.test_client() as c:
+        token = make_token(strategy, to_user, from_user)
+        url = '/accept/{token}'.format(token=token)
+        resp = c.get(url)
+        assert resp.status_code == 400
+
+        token = make_token(strategy, from_user, to_user)
+        url = '/accept/{token}'.format(token=token)
         resp = c.get(url)
         assert resp.status_code == 200
         assert resp.data == okay_response()
@@ -70,10 +74,15 @@ def test_reject_friend_request(strategy, users, app):
     from_user = users[0]
     to_user = users[1]
     do_invite_friend(strategy, from_user, to_user.email, 'Hello!')
-    token = make_token(strategy, from_user, to_user)
-    url = '/reject/{token}'.format(token=token)
 
     with app.test_client() as c:
+        token = make_token(strategy, to_user, from_user)
+        url = '/reject/{token}'.format(token=token)
+        resp = c.get(url)
+        assert resp.status_code == 400
+
+        token = make_token(strategy, from_user, to_user)
+        url = '/reject/{token}'.format(token=token)
         resp = c.get(url)
         assert resp.status_code == 200
         assert resp.data == okay_response()
@@ -83,10 +92,15 @@ def test_cancel_friend_request(strategy, users, app):
     from_user = users[0]
     to_user = users[1]
     do_invite_friend(strategy, from_user, to_user.email, 'Hello!')
-    token = make_token(strategy, from_user, to_user)
-    url = '/cancel/{token}'.format(token=token)
 
     with app.test_client() as c:
+        token = make_token(strategy, to_user, from_user)
+        url = '/cancel/{token}'.format(token=token)
+        resp = c.get(url)
+        assert resp.status_code == 400
+
+        token = make_token(strategy, from_user, to_user)
+        url = '/cancel/{token}'.format(token=token)
         resp = c.get(url)
         assert resp.status_code == 200
         assert resp.data == okay_response()
