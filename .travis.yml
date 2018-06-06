@@ -4,7 +4,7 @@ python:
  - "2.7"
 
 install:
-  - make install
+  - make config
 
 script:
   - make lint
