@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from mock import Mock
 
-from utils import do_invite_return_token_request
 from friends.utils import make_token
 from friends.actions import do_invite_friend, friendship_request_list,\
     accept_friendship_request, new_user_created, reject_friendship_request,\
@@ -25,6 +24,17 @@ def test_do_invite_friend(app, users, friends):
     assert strategy.storage.friendInvitation.objects.filter(
         from_user=from_user, to_user_email=to_user_email, message="Hello!"
     ).count() > 0
+
+    # to self
+    to_user = from_user
+    mock_request_email = Mock()
+    strategy.send_friendship_request_email = mock_request_email
+    do_invite_friend(strategy, from_user=from_user,
+                     to_user_email=to_user.email,
+                     message=message)
+    assert mock_request_email.call_count == 0
+    assert strategy.storage.friendshipRequest.objects.filter(
+        from_user=from_user, to_user=to_user, message=message).count() == 0
 
     # to_user exists
     to_user = users[1]

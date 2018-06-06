@@ -3,12 +3,20 @@
 import json
 import binascii
 
-from utils import do_invite_return_token_request
 from friends.utils import make_token
 from friends.frameworks.flask.routes import okay_response
-from friends.actions import do_invite_friend, reject_friendship_request, accept_friendship_request
+from friends.actions import do_invite_friend, reject_friendship_request, accept_friendship_request, \
+    _load_friendship_request
 
 new_user_headers = {'AUTHORIZATION': binascii.hexlify('id1234567890')}
+
+
+def do_invite_return_token_request(strategy, from_user, to_user):
+    do_invite_friend(strategy, from_user=from_user,
+                     to_user_email=to_user.email, message="Hello!")
+    token = make_token(strategy, from_user, to_user)
+    request = _load_friendship_request(strategy, token)
+    return token, request
 
 
 def test_batch_resource_access_control(app, friends):

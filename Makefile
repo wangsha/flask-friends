@@ -13,7 +13,7 @@ clean-test:
 	rm -fr htmlcov
 	rm -f junit.xml
 
-install: clean
+config: clean
 	pip install -r requirements.txt
 	pip install -e .
 

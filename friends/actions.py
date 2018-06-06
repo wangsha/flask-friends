@@ -2,21 +2,26 @@ from friends.utils import make_token, get_serializer
 
 
 def do_invite_friend(strategy, from_user, to_user_email, message):
+    if from_user.email == to_user_email:
+        return False
     storage = strategy.storage
     if storage.user.user_exists(to_user_email):
         to_user = storage.user.get_user_by_email(to_user_email)
-        storage.friendshipRequest.create(
+        res = storage.friendshipRequest.create(
             from_user=from_user, to_user=to_user, message=message)
-        token = make_token(strategy, from_user, to_user)
-        strategy.send_friendship_request_email(from_user=from_user, to_user=to_user,
-                                               message=message, authentication_token=token)
+        if res:
+            token = make_token(strategy, from_user, to_user)
+            strategy.send_friendship_request_email(from_user=from_user, to_user=to_user,
+                                                   message=message, authentication_token=token)
     else:
-        storage.friendInvitation.create(from_user=from_user,
-                                        to_user_email=to_user_email,
-                                        message=message)
-        strategy.send_friendship_invitation_email(from_user=from_user,
-                                                  to_user_email=to_user_email,
-                                                  message=message)
+        res = storage.friendInvitation.create(from_user=from_user,
+                                              to_user_email=to_user_email,
+                                              message=message)
+        if res:
+            strategy.send_friendship_invitation_email(from_user=from_user,
+                                                      to_user_email=to_user_email,
+                                                      message=message)
+        return res
 
 
 def new_user_created(strategy, user):
