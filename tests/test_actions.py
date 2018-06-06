@@ -2,10 +2,18 @@
 from mock import Mock
 
 from friends.utils import make_token
-from friends.actions import do_invite_friend, friendship_request_list,\
-    accept_friendship_request, new_user_created, reject_friendship_request,\
-    cancel_friendship_request, friendlist, friendship_request_list_rejected,\
-    delete_friend, friendship_invitation_list
+from friends.actions import do_invite_friend, friendship_request_list, \
+    accept_friendship_request, new_user_created, reject_friendship_request, \
+    cancel_friendship_request, friendlist, friendship_request_list_rejected, \
+    delete_friend, friendship_invitation_list, _load_friendship_request
+
+
+def do_invite_return_token_request(strategy, from_user, to_user):
+    do_invite_friend(strategy, from_user=from_user,
+                     to_user_email=to_user.email, message="Hello!")
+    token = make_token(strategy, from_user, to_user)
+    request = _load_friendship_request(strategy, token)
+    return token, request
 
 
 def test_do_invite_friend(app, users, friends):
