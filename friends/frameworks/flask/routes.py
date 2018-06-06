@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from flask import Blueprint, g, request
-from werkzeug.exceptions import abort, BadRequestKeyError
+from werkzeug.exceptions import abort, BadRequestKeyError, BadRequest
 
 from friends.actions import do_invite_friend, \
     accept_friendship_request, reject_friendship_request, cancel_friendship_request, \
@@ -109,10 +109,11 @@ def create_friendship():
                          from_user=user,
                          to_user_email=email,
                          message=message)
-    except BadRequestKeyError:
+        return okay_response(), 200
+
+    except BadRequest:
         abort(400)
 
-    return okay_response(), 200
 
 
 @friends_blueprint.route('/accept/<string:token>', methods=('GET',))
