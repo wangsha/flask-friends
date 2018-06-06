@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from flask import Blueprint, g, request
-from werkzeug.exceptions import abort
+from werkzeug.exceptions import abort, BadRequestKeyError
 
 from friends.actions import do_invite_friend, \
     accept_friendship_request, reject_friendship_request, cancel_friendship_request, \
@@ -101,13 +101,17 @@ def create_friendship():
     if not user:
         abort(401)
 
-    email = request.form['email'] if request.form else request.json['email']
-    message = request.form['message'] if request.form else request.json['message']
+    try:
+        email = request.form['email'] if request.form else request.json['email']
+        message = request.form['message'] if request.form else request.json['message']
 
-    do_invite_friend(g.strategy,
-                     from_user=user,
-                     to_user_email=email,
-                     message=message)
+        do_invite_friend(g.strategy,
+                         from_user=user,
+                         to_user_email=email,
+                         message=message)
+    except BadRequestKeyError:
+        abort(400)
+
     return okay_response(), 200
 
 
