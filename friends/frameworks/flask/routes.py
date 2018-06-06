@@ -112,8 +112,7 @@ def create_friendship():
         return okay_response(), 200
 
     except Exception as e:
-        return e.message, 400
-
+        return e.message, e.code
 
 
 @friends_blueprint.route('/accept/<string:token>', methods=('GET',))
@@ -123,7 +122,7 @@ def accept_friend_request(token):
         accept_friendship_request(g.strategy, token)
         return okay_response(), 200
     except Exception as e:
-        return e.message, 400
+        return e.message, e.code
 
 
 @friends_blueprint.route('/reject/<string:token>', methods=('GET',))
@@ -133,7 +132,7 @@ def reject_friend_request(token):
         reject_friendship_request(g.strategy, token)
         return okay_response(), 200
     except Exception as e:
-        return e.message, 400
+        return e.message, e.code
 
 
 @friends_blueprint.route('/cancel/<string:token>', methods=('GET',))
@@ -143,7 +142,7 @@ def cancel_friend_request(token):
         cancel_friendship_request(g.strategy, token)
         return okay_response(), 200
     except Exception as e:
-        return e.message, 400
+        return e.message, e.code
 
 
 @friends_blueprint.route('/friend_invitations', methods=('GET',))
@@ -193,4 +192,4 @@ def remove_friend(token):
         delete_friend(g.strategy, token)
         return okay_response(), 200
     except Exception as e:
-        return e.message, 400
+        return e.message, e.code
