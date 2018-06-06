@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from flask import Blueprint, g, request
-from werkzeug.exceptions import abort, BadRequestKeyError, BadRequest
+from werkzeug.exceptions import abort
 
 from friends.actions import do_invite_friend, \
     accept_friendship_request, reject_friendship_request, cancel_friendship_request, \
@@ -97,11 +97,11 @@ def okay_response():
 @friends_blueprint.route('/request_friend', methods=('POST',))
 @load_strategy
 def create_friendship():
-    user = g.strategy.authenticate_request(request.headers.get('AUTHORIZATION', None))
-    if not user:
-        abort(401)
-
     try:
+        user = g.strategy.authenticate_request(request.headers.get('AUTHORIZATION', None))
+        if not user:
+            abort(401)
+
         email = request.form['email'] if request.form else request.json['email']
         message = request.form['message'] if request.form else request.json['message']
 
@@ -111,8 +111,8 @@ def create_friendship():
                          message=message)
         return okay_response(), 200
 
-    except BadRequest:
-        abort(400)
+    except Exception as e:
+        return e.message, 400
 
 
 
