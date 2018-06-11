@@ -6,6 +6,12 @@ def do_invite_friend(strategy, from_user, to_user_email, message):
         return False
     storage = strategy.storage
     if storage.user.user_exists(to_user_email):
+
+        # check for existing friendship
+        friendships = storage.friends.get_friends(from_user)
+        for friendship in friendships:
+            if friendship.user1.email == to_user_email or friendship.user2.email == to_user_email:
+                return False
         to_user = storage.user.get_user_by_email(to_user_email)
         res = storage.friendshipRequest.create(
             from_user=from_user, to_user=to_user, message=message)
@@ -72,8 +78,8 @@ def cancel_friendship_request(strategy, token):
 
 def friendship_request_list(strategy, user):
     storage = strategy.storage
-    res = list(storage.friendshipRequest.get_request_by_from_user(from_user=user)) \
-        + list(storage.friendshipRequest.get_request_by_to_user(to_user=user))
+    res = list(storage.friendshipRequest.get_request_by_from_user(from_user=user))
+    res += list(storage.friendshipRequest.get_request_by_to_user(to_user=user))
     return res
 
 
@@ -85,8 +91,8 @@ def friendship_invitation_list(strategy, user):
 
 def friendship_request_list_rejected(strategy, user):
     storage = strategy.storage
-    res = list(storage.friendshipRequest.get_rejected_request_by_from_user(from_user=user)) \
-        + list(storage.friendshipRequest.get_rejected_request_by_to_user(to_user=user))
+    res = list(storage.friendshipRequest.get_rejected_request_by_from_user(from_user=user))
+    res += list(storage.friendshipRequest.get_rejected_request_by_to_user(to_user=user))
     return res
 
 

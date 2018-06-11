@@ -94,55 +94,63 @@ def okay_response():
     return resp
 
 
+def error_handler(func):
+    from functools import wraps
+
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        try:
+            func(*args, **kwargs)
+            return okay_response(), 200
+        except AttributeError as e:
+            return e.message, 400
+        except Exception as e:
+            return e.message, e.code if hasattr(e, 'code') else 400
+
+    return wrapper
+
+
 @friends_blueprint.route('/request_friend', methods=('POST',))
 @load_strategy
+@error_handler
 def create_friendship():
-    try:
-        user = g.strategy.authenticate_request(request.headers.get('AUTHORIZATION', None))
-        if not user:
-            abort(401)
-
-        email = request.form['email'] if request.form else request.json['email']
-        message = request.form['message'] if request.form else request.json['message']
-
-        do_invite_friend(g.strategy,
-                         from_user=user,
-                         to_user_email=email,
-                         message=message)
-        return okay_response(), 200
-
-    except Exception as e:
-        return e.message, e.code
+    user = g.strategy.authenticate_request(request.headers.get('AUTHORIZATION', None))
+    if not user:
+        abort(401)
+    email = request.form['email'] if request.form else request.json['email']
+    message = request.form['message'] if request.form else request.json['message']
+    do_invite_friend(g.strategy,
+                     from_user=user,
+                     to_user_email=email,
+                     message=message)
 
 
 @friends_blueprint.route('/accept/<string:token>', methods=('GET',))
 @load_strategy
+@error_handler
 def accept_friend_request(token):
-    try:
-        accept_friendship_request(g.strategy, token)
-        return okay_response(), 200
-    except Exception as e:
-        return e.message, e.code
+    accept_friendship_request(g.strategy, token)
 
 
 @friends_blueprint.route('/reject/<string:token>', methods=('GET',))
 @load_strategy
+@error_handler
 def reject_friend_request(token):
-    try:
-        reject_friendship_request(g.strategy, token)
-        return okay_response(), 200
-    except Exception as e:
-        return e.message, e.code
+    reject_friendship_request(g.strategy, token)
 
 
 @friends_blueprint.route('/cancel/<string:token>', methods=('GET',))
 @load_strategy
+@error_handler
 def cancel_friend_request(token):
-    try:
-        cancel_friendship_request(g.strategy, token)
-        return okay_response(), 200
-    except Exception as e:
-        return e.message, e.code
+    cancel_friendship_request(g.strategy, token)
+
+
+@friends_blueprint.route('/remove/<string:token>', methods=('GET',))
+@load_strategy
+@error_handler
+def remove_friend(token):
+    delete_friend(g.strategy, token)
 
 
 @friends_blueprint.route('/friend_invitations', methods=('GET',))
@@ -183,13 +191,3 @@ def friends():
         abort(401)
     res = friendlist(g.strategy, user)
     return g.strategy.make_response(res)
-
-
-@friends_blueprint.route('/remove/<string:token>', methods=('GET',))
-@load_strategy
-def remove_friend(token):
-    try:
-        delete_friend(g.strategy, token)
-        return okay_response(), 200
-    except Exception as e:
-        return e.message, e.code
