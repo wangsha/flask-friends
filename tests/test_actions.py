@@ -95,8 +95,7 @@ def test_accept_friendship_request(strategy, users):
     strategy.storage.friends.create(user1=from_user, user2=to_user)
     token, request = do_invite_return_token_request(
         strategy, from_user, to_user)
-    accept_friendship_request(strategy, token)
-    assert not strategy.storage.friendshipRequest.objects.filter(pk=request.id)
+    assert request is None
     assert strategy.storage.friends.objects.filter(
         user1=from_user, user2=to_user).count() == 1
 
@@ -211,3 +210,39 @@ def test_friendship_invitation_list(strategy, users):
     do_invite_friend(strategy, from_user, 'bb@ff.com', 'Hi!')
     res = friendship_invitation_list(strategy, from_user)
     assert len(res) == 2
+
+
+def test_request_again_after_rejected(strategy, users):
+    from_user = users[0]
+    to_user = users[1]
+    token, request = do_invite_return_token_request(
+        strategy, from_user, to_user)
+    res = friendship_request_list(strategy, from_user)
+    assert len(res) == 1
+    res = friendship_request_list_rejected(strategy, from_user)
+    assert len(res) == 0
+
+    reject_friendship_request(strategy, token)
+    assert strategy.storage.friendshipRequest.objects.get(
+        pk=request.id).rejected_at is not None
+    res = friendship_request_list(strategy, from_user)
+    assert len(res) == 0
+    res = friendship_request_list_rejected(strategy, from_user)
+    assert len(res) == 1
+
+    # send request again with same from_user and to_user
+    do_invite_friend(strategy, from_user, to_user.email, '')
+    res = friendship_request_list_rejected(strategy, from_user)
+    assert len(res) == 0
+    res = friendship_request_list(strategy, from_user)
+    assert len(res) == 1
+
+
+def test_request_existing_friends(strategy, users):
+    from_user, to_user = users[0], users[1]
+    strategy.storage.friends.create(user1=from_user, user2=to_user)
+
+    do_invite_friend(strategy, from_user, to_user.email, 'Hi!')
+
+    res = friendship_request_list(strategy, from_user)
+    assert len(res) == 0
