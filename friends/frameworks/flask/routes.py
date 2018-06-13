@@ -119,10 +119,15 @@ def create_friendship():
         abort(401)
     email = request.form['email'] if request.form else request.json['email']
     message = request.form['message'] if request.form else request.json['message']
-    do_invite_friend(g.strategy,
-                     from_user=user,
-                     to_user_email=email,
-                     message=message)
+    res = do_invite_friend(g.strategy,
+                           from_user=user,
+                           to_user_email=email,
+                           message=message)
+    if not res:
+        e = Exception()
+        e.message = "cannot invite existing friends"
+        e.code = 400
+        raise e
 
 
 @friends_blueprint.route('/accept/<string:token>', methods=('GET',))

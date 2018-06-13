@@ -48,6 +48,7 @@ def test_create_friendship(app, friends, users):
                                    dict(email='new_user@ff.com', message=''))
     assert resp.status_code == 200
     assert resp.data == okay_response()
+
     resp = _test_create_friendship(app, headers,
                                    dict(email=users[1].email, message=''))
     assert resp.status_code == 200

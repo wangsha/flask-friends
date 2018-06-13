@@ -19,6 +19,7 @@ def do_invite_friend(strategy, from_user, to_user_email, message):
             token = make_token(strategy, from_user, to_user)
             strategy.send_friendship_request_email(from_user=from_user, to_user=to_user,
                                                    message=message, authentication_token=token)
+            return res
     else:
         res = storage.friendInvitation.create(from_user=from_user,
                                               to_user_email=to_user_email,
