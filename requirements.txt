@@ -1,7 +1,0 @@
-Flask
-flask-mongoengine
-itsdangerous
-pytest
-mock
-pytest-cov
-flake8

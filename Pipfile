@@ -1,0 +1,20 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+pytest = "*"
+mock = "*"
+pytest-cov = "*"
+flake8 = "*"
+black = "==19.10b0"
+
+
+[packages]
+flask-mongoengine = "*"
+itsdangerous = "*"
+Flask = "*"
+
+[requires]
+python_version = "3.7"

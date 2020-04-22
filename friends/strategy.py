@@ -8,7 +8,7 @@ class BaseStrategy(object):
         :param authorization: request Authorization header value
         :return: authenticated user, None if no user found
         """
-        raise NotImplementedError('Implement in subclass')
+        raise NotImplementedError("Implement in subclass")
 
     def encryption_key(self):
         """
@@ -16,14 +16,16 @@ class BaseStrategy(object):
         http://pythonhosted.org/itsdangerous/
         :return:
         """
-        raise NotImplementedError('Implement in subclass')
+        raise NotImplementedError("Implement in subclass")
 
     def send_friendship_invitation_email(self, from_user, to_user_email, message):
         """Send email notification to non-existing user
         """
-        raise NotImplementedError('Implement in subclass')
+        raise NotImplementedError("Implement in subclass")
 
-    def send_friendship_request_email(self, from_user, to_user, message, authentication_token):
+    def send_friendship_request_email(
+        self, from_user, to_user, message, authentication_token
+    ):
         """
             Send email notification to existing user.
             authentication_token is a string encoded payload of
@@ -34,4 +36,4 @@ class BaseStrategy(object):
             }
             this token can be embedded in url and need to be passed back when accept/reject friend
         """
-        raise NotImplementedError('Implement in subclass')
+        raise NotImplementedError("Implement in subclass")
