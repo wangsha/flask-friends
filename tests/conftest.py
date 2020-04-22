@@ -23,11 +23,11 @@ from friends.frameworks.flask import Friends
 
 @pytest.fixture()
 def db(app):
-    db_name = 'flask_friends_test_%s' % str(time.time()).replace('.', '_')
-    app.config['MONGODB_SETTINGS'] = {
-        'db': db_name,
-        'host': 'localhost',
-        'port': 27017,
+    db_name = "flask_friends_test_%s" % str(time.time()).replace(".", "_")
+    app.config["MONGODB_SETTINGS"] = {
+        "db": db_name,
+        "host": "localhost",
+        "port": 27017,
     }
     _db = MongoEngine(app)
 
@@ -50,8 +50,9 @@ def user_cls(db):
         password = db.StringField(max_length=255)
         active = db.BooleanField(default=True)
 
-        USERNAME_FIELD = 'email'
-        meta = {'allow_inheritance': True}
+        USERNAME_FIELD = "email"
+        meta = {"allow_inheritance": True}
+
     yield User
 
 
@@ -59,16 +60,15 @@ def user_cls(db):
 def users(app, user_cls):
     with app.app_context():
         users = [
-            ('judy@ff.com', 'judy', None, True),
-            ('harry@ff.com', 'harry', None, True),
-            ('sha@ff.com', 'sha', None, True),
-            ('walle@ff.com', 'walle', None, True),
-            ('tony@ff.com', 'tony', None, False),
-            ('bob@ff.com', 'bob', None, False),
+            ("judy@ff.com", "judy", None, True),
+            ("harry@ff.com", "harry", None, True),
+            ("sha@ff.com", "sha", None, True),
+            ("walle@ff.com", "walle", None, True),
+            ("tony@ff.com", "tony", None, False),
+            ("bob@ff.com", "bob", None, False),
         ]
         for u in users:
-            user = user_cls(email=u[0], username=u[1], password=u[2],
-                            active=u[3])
+            user = user_cls(email=u[0], username=u[1], password=u[2], active=u[3])
             user.save()
     return user_cls.objects
 
@@ -76,7 +76,6 @@ def users(app, user_cls):
 @pytest.fixture()
 def strategy_cls(app, db):
     class TestStrategy(BaseStrategy):
-
         def authenticate_request(self, authorization):
             if not authorization:
                 return None
@@ -87,12 +86,14 @@ def strategy_cls(app, db):
             return jsonify(results)
 
         def encryption_key(self):
-            return 'IamSoSecret!!'
+            return "IamSoSecret!!"
 
         def send_friendship_invitation_email(self, from_user, to_user_email, message):
             pass
 
-        def send_friendship_request_email(self, from_user, to_user, message, authentication_token):
+        def send_friendship_request_email(
+            self, from_user, to_user, message, authentication_token
+        ):
             pass
 
     return TestStrategy
@@ -100,8 +101,7 @@ def strategy_cls(app, db):
 
 @pytest.fixture
 def friends(app, db, user_cls, strategy_cls):
-    friends = Friends(
-        app, db=db, user_cls=user_cls, strategy_cls=strategy_cls)
+    friends = Friends(app, db=db, user_cls=user_cls, strategy_cls=strategy_cls)
     return friends
 
 
@@ -110,11 +110,11 @@ def strategy(friends):
     return friends.get_strategy()
 
 
-@pytest.fixture()
+@pytest.fixture(autouse=True)
 def app():
     _app = Flask(__name__)
-    _app.debug = True
-    _app.config['TESTING'] = True
+    _app.debug = False
+    _app.config["TESTING"] = True
     _app.register_blueprint(friends_blueprint)
     with _app.app_context():
         yield _app

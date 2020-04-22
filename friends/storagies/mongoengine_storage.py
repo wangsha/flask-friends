@@ -2,8 +2,13 @@ from datetime import datetime
 
 from mongoengine import EmailField, StringField, DateTimeField, Q
 
-from friends.storage import UserMixin, FriendInvitationMixin, FriendshipRequestMixin, FriendsMixin, \
-    BaseStorage
+from friends.storage import (
+    UserMixin,
+    FriendInvitationMixin,
+    FriendshipRequestMixin,
+    FriendsMixin,
+    BaseStorage,
+)
 
 
 class MongoengineUserMixin(UserMixin):
@@ -37,10 +42,7 @@ class MongoengineFriendInvitationMixin(FriendInvitationMixin):
 
     @classmethod
     def create(cls, from_user, to_user_email, message):
-        return cls.objects(
-            from_user=from_user,
-            to_user_email=to_user_email
-        ).upsert_one(
+        return cls.objects(from_user=from_user, to_user_email=to_user_email).upsert_one(
             set__message=message,
         )
 
@@ -67,14 +69,17 @@ class MongoengineFriendshipRequestMixin(FriendshipRequestMixin):
     def create(cls, from_user, to_user, message=None):
         """Create a friendship request"""
         # TODO: handle existing to_user friend from_user
-        obj = cls.objects(from_user=from_user, to_user=to_user)\
-            .upsert_one(set__message=message, set__rejected_at=None)
+        obj = cls.objects(from_user=from_user, to_user=to_user).upsert_one(
+            set__message=message
+        )
         return obj
 
     @classmethod
     def get_request(cls, from_user, to_user):
         """Return a non-rejected friendship request"""
-        return cls.objects(from_user=from_user, to_user=to_user, rejected_at=None).first()
+        return cls.objects(
+            from_user=from_user, to_user=to_user, rejected_at=None
+        ).first()
 
     @classmethod
     def get_request_by_from_user(cls, from_user):
@@ -102,7 +107,9 @@ class MongoengineFriendshipRequestMixin(FriendshipRequestMixin):
 
     @classmethod
     def reject(cls, *ids_to_reject):
-        return cls.objects.filter(pk__in=ids_to_reject).update(set__rejected_at=datetime.utcnow())
+        return cls.objects.filter(pk__in=ids_to_reject).update(
+            set__rejected_at=datetime.utcnow()
+        )
 
 
 class MongoenginFriendsMixin(FriendsMixin):

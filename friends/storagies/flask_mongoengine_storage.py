@@ -1,7 +1,12 @@
-from mongoengine import ReferenceField
+from mongoengine import ReferenceField, CASCADE
 
-from friends.storagies.mongoengine_storage import BaseMongoengineStorage, MongoenginFriendsMixin, \
-    MongoengineFriendInvitationMixin, MongoengineFriendshipRequestMixin, MongoengineUserMixin
+from friends.storagies.mongoengine_storage import (
+    BaseMongoengineStorage,
+    MongoenginFriendsMixin,
+    MongoengineFriendInvitationMixin,
+    MongoengineFriendshipRequestMixin,
+    MongoengineUserMixin,
+)
 
 
 class FlaskMongoengineStorage(BaseMongoengineStorage):
@@ -20,15 +25,24 @@ def init_friends(app, db, user_cls):
             return User
 
     class FriendInvitation(MongoengineFriendInvitationMixin, db.Document):
-        from_user = ReferenceField(User, required=True, unique_with='to_user_email')
+        from_user = ReferenceField(
+            User,
+            required=True,
+            reverse_delete_rule=CASCADE,
+            unique_with="to_user_email",
+        )
 
     class FriendshipRequest(MongoengineFriendshipRequestMixin, db.Document):
         from_user = ReferenceField(User, required=True)
-        to_user = ReferenceField(User, required=True, unique_with='from_user')
+        to_user = ReferenceField(
+            User, required=True, reverse_delete_rule=CASCADE, unique_with="from_user"
+        )
 
     class Friends(MongoenginFriendsMixin, db.Document):
         user1 = ReferenceField(User, required=True)
-        user2 = ReferenceField(User, required=True, unique_with='user1')
+        user2 = ReferenceField(
+            User, required=True, reverse_delete_rule=CASCADE, unique_with="user1"
+        )
 
     FlaskMongoengineStorage.user = UserKlass
     FlaskMongoengineStorage.friendInvitation = FriendInvitation

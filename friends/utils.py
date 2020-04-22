@@ -8,7 +8,7 @@ def import_module(name):
 
 
 def module_member(name):
-    mod, member = name.rsplit('.', 1)
+    mod, member = name.rsplit(".", 1)
     module = import_module(mod)
     return getattr(module, member)
 
@@ -24,7 +24,7 @@ def get_serializer(strategy):
 
 def make_token(strategy, from_user, to_user):
     payload = {
-        'from_user_id': "%s" % strategy.storage.user.get_id(from_user),
-        'to_user_id': "%s" % strategy.storage.user.get_id(to_user)
+        "from_user_id": "%s" % strategy.storage.user.get_id(from_user),
+        "to_user_id": "%s" % strategy.storage.user.get_id(to_user),
     }
     return get_serializer(strategy).dumps(payload)

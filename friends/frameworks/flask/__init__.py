@@ -1,5 +1,6 @@
 from friends.storagies.flask_mongoengine_storage import (
-    init_friends, FlaskMongoengineStorage,
+    init_friends,
+    FlaskMongoengineStorage,
 )
 from friends.utils import get_strategy
 
@@ -16,7 +17,7 @@ class Friends(object):
         init_friends(app, db, user_cls)
         self.storage = FlaskMongoengineStorage
         self.strategy_cls = strategy_cls
-        app.extensions['friends'] = self
+        app.extensions["friends"] = self
 
     def get_strategy(self):
         return get_strategy(self.strategy_cls, self.storage)
