@@ -18,7 +18,7 @@ install: clean
 
 lint:
 	pipenv run black --check .
-	flake8
+	pipenv run flake8
 
 test .coverage: lint
 	pipenv run python -m pytest -l tests
