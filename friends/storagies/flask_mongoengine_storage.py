@@ -33,13 +33,13 @@ def init_friends(app, db, user_cls):
         )
 
     class FriendshipRequest(MongoengineFriendshipRequestMixin, db.Document):
-        from_user = ReferenceField(User, required=True)
+        from_user = ReferenceField(User, required=True, reverse_delete_rule=CASCADE)
         to_user = ReferenceField(
             User, required=True, reverse_delete_rule=CASCADE, unique_with="from_user"
         )
 
     class Friends(MongoenginFriendsMixin, db.Document):
-        user1 = ReferenceField(User, required=True)
+        user1 = ReferenceField(User, required=True, reverse_delete_rule=CASCADE)
         user2 = ReferenceField(
             User, required=True, reverse_delete_rule=CASCADE, unique_with="user1"
         )
