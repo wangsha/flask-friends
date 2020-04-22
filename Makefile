@@ -14,14 +14,14 @@ clean-test:
 	rm -f junit.xml
 
 config: clean
-	pip install -r requirements.txt
-	pip install -e .
+	pipenv install --dev
 
 lint:
+	pipenv run black --check .
 	flake8
 
 test .coverage: lint
-	pytest --cov-report=term:skip-covered --cov=friends --cov-branch
+	pipenv run python -m pytest -l tests
 
 cov: .coverage
 	@coverage report --skip-covered
