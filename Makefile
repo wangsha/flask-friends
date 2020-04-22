@@ -13,7 +13,7 @@ clean-test:
 	rm -fr htmlcov
 	rm -f junit.xml
 
-config: clean
+install: clean
 	pipenv install --dev
 
 lint:
