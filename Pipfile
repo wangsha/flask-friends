@@ -8,7 +8,7 @@ pytest = "*"
 mock = "*"
 pytest-cov = "*"
 flake8 = "*"
-black = "==19.10b0"
+black = "*"
 
 
 [packages]
